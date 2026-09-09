@@ -70,12 +70,12 @@ async function apiCall(method, urlPath, bodyObj) {
   return { httpStatus: res.status, body: parsed };
 }
 
-// ---------- /api/pay : ouverture de session ----------
-async function openSession({ mode, amount, label, shopperReference, shopperCountryCode, consentMode }) {
+// ---------- construction du corps /sessions (partagee par /api/pay et /api/session-preview) ----------
+function buildSessionBody({ mode, amount, label, shopperReference, shopperCountryCode, consentMode }) {
   const m = cfg.paymentModes[mode];
   if (!m) throw new Error('Mode inconnu : ' + mode);
   if (!amount || !amount.value) throw new Error('Montant manquant');
-  const reqBody = {
+  return {
     amount: { value: amount.value, currency: amount.currency || 'EUR' },
     reference: 'sim-' + mode + '-' + Date.now(),
     publicStoreId: cfg.publicStoreId,
@@ -93,15 +93,30 @@ async function openSession({ mode, amount, label, shopperReference, shopperCount
       { id: 'sim-item', description: label || 'Article', quantity: 1, amountIncludingTax: amount.value },
     ],
   };
+}
+
+// ---------- /api/pay : ouverture de session ----------
+async function openSession(params) {
+  const reqBody = buildSessionBody(params);
   const res = await apiCall('POST', '/sessions', reqBody);
   if (res.httpStatus !== 200) throw new Error('sessions ' + res.httpStatus + ' : ' + JSON.stringify(res.body));
   return {
     clientSession: res.body.clientSession,
     clientKey: cfg.clientKey,
     environment: cfg.adyenEnvironment,
-    label: label || 'Paiement',
+    label: params.label || 'Paiement',
     amount: reqBody.amount,
     reference: reqBody.reference,
+  };
+}
+
+// ---------- /api/session-preview : le MEME payload que /sessions, SANS appeler Adyen ----------
+function sessionPreview(params) {
+  return {
+    method: 'POST',
+    url: cfg.baseUrl + '/api/public/v1/sessions',
+    headers: { 'Authorization': 'Bearer <token Hydra>', 'Content-Type': 'application/json', 'Idempotency-Key': '<uuid genere a l envoi>' },
+    body: buildSessionBody(params),
   };
 }
 
@@ -160,6 +175,9 @@ const server = http.createServer(async (req, res) => {
   try {
     if (req.method === 'POST' && req.url === '/api/pay') {
       return sendJson(res, 200, await openSession(JSON.parse((await readBody(req)) || '{}')));
+    }
+    if (req.method === 'POST' && req.url === '/api/session-preview') {
+      return sendJson(res, 200, sessionPreview(JSON.parse((await readBody(req)) || '{}')));
     }
     if (req.method === 'POST' && req.url === '/api/op') {
       const out = await operation(JSON.parse((await readBody(req)) || '{}'));

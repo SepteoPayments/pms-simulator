@@ -269,6 +269,30 @@
     "</div>";
   }
 
+  // ---- panneau "donnees de test & conditions" (copie 1 clic) ----
+  function testDataPanel() {
+    var cards = [
+      ['Visa', '4111 1111 1111 1111', '4111111111111111', 'exp 03/30 · CVC 737'],
+      ['Mastercard', '5555 5555 5555 4444', '5555555555554444', 'exp 03/30 · CVC 737'],
+      ['American Express', '3700 0000 0000 002', '370000000000002', 'exp 03/30 · CID 7373'],
+      ['Bancontact (BE)', '5127 8809 9999 9990', '5127880999999990', 'exp 03/30 · CVC 737 · pays = BE']
+    ];
+    function copyBtn(v) { return '<button type="button" class="td-copy" data-copy="' + v + '" title="Copier">📋</button>'; }
+    var rows = cards.map(function (c) {
+      return '<div class="td-row"><span class="td-name">' + esc(c[0]) + '</span>' +
+        '<code class="td-val">' + esc(c[1]) + '</code>' + copyBtn(c[2]) +
+        '<span class="td-meta">' + esc(c[3]) + '</span></div>';
+    }).join('');
+    rows += '<div class="td-row"><span class="td-name">SEPA</span>' +
+      '<code class="td-val">FR14 2004 1010 0505 0001 3M02 606</code>' + copyBtn('FR1420041010050500013M02606') +
+      '<span class="td-meta">titulaire <b>A. Grand</b> · <b class="td-warn">&lt; 500 €</b> (au-delà = refusé)</span></div>';
+    rows += '<div class="td-row"><span class="td-name">Klarna</span><span class="td-meta">pays <b>FR/DE</b> + panier (lineItems) · sandbox auto-approuvé (code OTP de test si demandé)</span></div>';
+    rows += '<div class="td-row"><span class="td-name">ANCV</span><span class="td-meta">activé sur la boutique côté Adyen · <b>FR / EUR</b> — sinon invisible</span></div>';
+    return '<details class="td-panel" open><summary>🧪 Données de test &amp; conditions — clique 📋 pour copier</summary>' +
+      '<div class="td-list">' + rows + '</div>' +
+      '<p class="td-foot">Sandbox uniquement. Un moyen n\'apparaît que selon le <b>pays du payeur</b>, la devise, les lineItems et son activation côté PSP.</p></details>';
+  }
+
   function goPay(ctx) {
     setStep(3);
     var ml = MODE_LABEL[ctx.mode] || MODE_LABEL.immediate;
@@ -279,7 +303,8 @@
       payMethodsBanner(ctx.mode) +
       '<div class="status show warn" id="co-status">Ouverture de la session de paiement…</div>' +
       '<div id="co-dropin"></div>' +
-      '<div class="testcards">🔒 Paiement sécurisé par <b>Payments by Septeo</b> (Adyen, environnement de test). Carte de test : <code>4111 1111 1111 1111</code> · <code>03/30</code> · CVC <code>737</code>.</div>';
+      '<div class="testcards">🔒 Paiement sécurisé par <b>Payments by Septeo</b> (Adyen, environnement de test).</div>' +
+      testDataPanel();
     var statusEl = bodyEl.querySelector('#co-status');
     function st(k, m) { statusEl.className = 'status show ' + k; statusEl.textContent = m; }
 
@@ -294,6 +319,17 @@
         statusEl.className = 'status';
         return AdyenCheckout({
           environment: d.environment, clientKey: d.clientKey, locale: 'fr-FR', session: { id: p.id, sessionData: p.sessionData },
+          // Garde-fou SEPA : plafond sandbox 500 €. On bloque le submit AU MOMENT du choix du moyen
+          // (le moyen n'est connu qu'ici, pas a l'ouverture de session). >= 500 € => rejet net + message.
+          beforeSubmit: function (data, component, actions) {
+            var type = (data && data.paymentMethod && data.paymentMethod.type) || '';
+            if (/sepa/i.test(type) && ctx.amount >= 50000) {
+              st('err', 'SEPA bloqué : plafond sandbox 500 € (montant ' + euros(ctx.amount, ctx.currency) + '). Passe le montant sous 500 € pour tester le prélèvement SEPA.');
+              actions.reject();
+              return;
+            }
+            actions.resolve(data);
+          },
           onPaymentCompleted: function (result) {
             var reservation = {
               theme: key, themeName: theme.name, themeProduct: theme.product, emoji: theme.emoji, accent: theme.accent,
@@ -320,6 +356,83 @@
     if (b.getAttribute('data-summary')) { try { sum = JSON.parse(b.getAttribute('data-summary')); } catch (x) {} }
     if (b.getAttribute('data-prefill')) { try { pre = JSON.parse(b.getAttribute('data-prefill')); } catch (x) {} }
     open({ amount: Number(b.getAttribute('data-amount')) || 0, mode: b.getAttribute('data-mode') || 'immediate', itemLabel: b.getAttribute('data-label') || 'Paiement', summary: sum, prefill: pre });
+  });
+
+  // ---- copie 1 clic (donnees de test + payload), delegue ----
+  document.addEventListener('click', function (e) {
+    var c = e.target.closest && e.target.closest('[data-copy]');
+    if (!c) return;
+    e.preventDefault();
+    var v = c.getAttribute('data-copy') || '';
+    try { if (navigator.clipboard) navigator.clipboard.writeText(v); } catch (x) {}
+    var old = c.textContent; c.textContent = '✓'; setTimeout(function () { c.textContent = old; }, 1000);
+  });
+
+  // ---- "Voir le payload de session" sous chaque bouton [data-checkout] ----
+  function hlJson(s) {
+    return esc(s)
+      .replace(/&quot;([^&]+?)&quot;:/g, '<span class="k">"$1"</span>:')
+      .replace(/: &quot;([^&]*?)&quot;/g, ': <span class="s">"$1"</span>')
+      .replace(/: (-?\d+)/g, ': <span class="n">$1</span>')
+      .replace(/: (true|false|null)/g, ': <span class="n">$1</span>');
+  }
+  var peekOv = document.createElement('div');
+  peekOv.className = 'overlay peek-overlay';
+  peekOv.innerHTML =
+    '<div class="modal peek-modal">' +
+      '<div class="peek-head"><b>👁 Payload de session</b><small>POST /api/public/v1/sessions — ce qui serait envoyé, sans déclencher le paiement</small>' +
+        '<button class="close peek-close" type="button" aria-label="Fermer">✕</button></div>' +
+      '<pre class="peek-json"></pre>' +
+      '<div class="peek-foot"><button type="button" class="td-copy peek-copy" data-copy="">📋 Copier le payload</button></div>' +
+    '</div>';
+  document.body.appendChild(peekOv);
+  var peekJson = peekOv.querySelector('.peek-json');
+  var peekCopy = peekOv.querySelector('.peek-copy');
+  function closePeek() { peekOv.classList.remove('show'); }
+  peekOv.querySelector('.peek-close').onclick = closePeek;
+  peekOv.addEventListener('click', function (e) { if (e.target === peekOv) closePeek(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closePeek(); });
+
+  function showPeek(btn) {
+    var mode = btn.getAttribute('data-mode') || 'immediate';
+    var amount = Number(btn.getAttribute('data-amount')) || 0;
+    var label = btn.getAttribute('data-label') || 'Paiement';
+    peekJson.textContent = 'Chargement…'; peekCopy.setAttribute('data-copy', '');
+    peekOv.classList.add('show');
+    fetch('/api/session-preview', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode: mode, amount: { value: amount, currency: 'EUR' }, label: label }) })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        var text = JSON.stringify((d && d.body) || d, null, 2);
+        peekCopy.setAttribute('data-copy', text);
+        peekJson.innerHTML = hlJson(text);
+      })
+      .catch(function (e) { peekJson.textContent = 'Erreur : ' + (e.message || e); });
+  }
+
+  function addPeek(btn) {
+    var n = btn.nextElementSibling;
+    if (n && n.classList && n.classList.contains('co-peek')) return;
+    var pk = document.createElement('button');
+    pk.type = 'button'; pk.className = 'co-peek'; pk.setAttribute('data-peek', '');
+    pk.title = 'Voir le payload de session (sans payer)'; pk.textContent = '👁 payload';
+    pk.setAttribute('data-mode', btn.getAttribute('data-mode') || 'immediate');
+    pk.setAttribute('data-amount', btn.getAttribute('data-amount') || '0');
+    pk.setAttribute('data-label', btn.getAttribute('data-label') || 'Paiement');
+    btn.insertAdjacentElement('afterend', pk);
+  }
+  function scanPeek(root) { if (root && root.querySelectorAll) root.querySelectorAll('[data-checkout]').forEach(addPeek); }
+  scanPeek(document);
+  try {
+    new MutationObserver(function (muts) {
+      muts.forEach(function (m) { if (m.addedNodes) m.addedNodes.forEach(function (nd) { if (nd.nodeType === 1) { if (nd.matches && nd.matches('[data-checkout]')) addPeek(nd); scanPeek(nd); } }); });
+    }).observe(document.body, { childList: true, subtree: true });
+  } catch (x) {}
+  document.addEventListener('click', function (e) {
+    var pk = e.target.closest && e.target.closest('[data-peek]');
+    if (!pk) return;
+    e.preventDefault(); e.stopPropagation();
+    showPeek(pk);
   });
 
   window.PMS = window.PMS || {};

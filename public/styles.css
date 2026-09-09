@@ -340,6 +340,37 @@ body.conf { background: var(--bg); }
 .testcards b { color: var(--brand); }
 
 /* =========================================================
+   Données de test & conditions (étape 3) + copie 1 clic
+   ========================================================= */
+.td-panel { border: 1px solid var(--line); border-radius: 12px; padding: 4px 12px 10px; margin: 10px 0 4px; background: #faf9f7; }
+.td-panel > summary { cursor: pointer; font-size: 12.5px; font-weight: 700; color: var(--brand); padding: 8px 2px; list-style: none; }
+.td-panel > summary::-webkit-details-marker { display: none; }
+.td-list { display: flex; flex-direction: column; gap: 6px; }
+.td-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 12px; }
+.td-name { min-width: 128px; font-weight: 600; color: var(--ink, #222); }
+.td-val { background: #101a26; color: #dfe9f2; padding: 2px 8px; border-radius: 6px; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 12px; }
+.td-meta { color: var(--muted); }
+.td-warn { color: #b45309; }
+.td-copy { border: 1px solid var(--line); background: #fff; border-radius: 6px; cursor: pointer; font-size: 12px; line-height: 1; padding: 3px 7px; }
+.td-copy:hover { border-color: var(--brand); }
+.td-foot { color: var(--muted); font-size: 11px; margin: 10px 2px 2px; }
+
+/* Bouton discret "voir le payload" sous chaque bouton de paiement */
+.co-peek { display: inline-block; margin: 4px 0 0 6px; padding: 2px 8px; font-size: 11px; line-height: 1.5; color: var(--muted); background: transparent; border: 1px dashed var(--line); border-radius: 999px; cursor: pointer; vertical-align: middle; }
+.co-peek:hover { color: var(--brand); border-color: var(--brand); }
+
+/* Modale de preview du payload de session */
+.peek-overlay { align-items: flex-start; }
+.peek-modal { max-width: 620px; width: 100%; margin: 6vh auto; padding: 0; overflow: hidden; }
+.peek-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+.peek-head b { font-size: 14px; }
+.peek-head small { color: var(--muted); font-size: 11.5px; flex: 1; min-width: 120px; }
+.peek-head .peek-close { margin-left: auto; }
+.peek-json { margin: 0; padding: 16px; background: #101a26; color: #dfe9f2; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 12px; line-height: 1.55; overflow: auto; max-height: 62vh; }
+.peek-json .k { color: #9cd3ff; } .peek-json .s { color: #ffd59a; } .peek-json .n { color: #b8f0c5; }
+.peek-foot { padding: 12px 16px; border-top: 1px solid var(--line); text-align: right; }
+
+/* =========================================================
    Bandeau « vos moyens de paiement » (étape 3, informatif — Adyen filtre réellement)
    ========================================================= */
 .pm-band { --accent: #14324f; border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px 12px; margin: 14px 0 16px; background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 7%, #fff), #fff); position: relative; overflow: hidden; }
