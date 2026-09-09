@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Plat — Brasserie du Vieux-Port</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&family=Karla:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="styles.css" /><link rel="stylesheet" href="ui.css" /><link rel="stylesheet" href="skins.css" />
+<link rel="stylesheet" href="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.68.0/adyen.css" />
+<script src="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.68.0/adyen.js"></script>
+<style>
+  .dish-hero { display: grid; grid-template-columns: 1.2fr 1fr; gap: 30px; align-items: center; padding: 20px 0 30px; }
+  .dish-hero .ph { border-radius: 24px; overflow: hidden; aspect-ratio: 4/3; box-shadow: 0 30px 60px rgba(60,20,20,.2); position: relative; }
+  .dish-hero .ph img { width: 100%; height: 100%; object-fit: cover; }
+  .dish-hero .ph .pop { position: absolute; top: 14px; left: 14px; }
+  .dish-hero h1 { font-size: clamp(30px, 4vw, 46px); margin: 6px 0 10px; line-height: 1.05; }
+  .dish-hero .price { font-family: var(--font-head); font-size: 34px; color: var(--brand); }
+  .dish-hero .desc { font-size: 16px; line-height: 1.6; color: var(--ink); }
+  @media (max-width: 800px) { .dish-hero { grid-template-columns: 1fr; } }
+  .story { background: var(--surface); border-left: 4px solid var(--accent); border-radius: 0 18px 18px 0; padding: 18px 22px; font-family: var(--font-head); font-style: italic; font-size: 17px; line-height: 1.6; color: var(--ink); }
+  .story b { display: block; font-family: var(--font-body); font-style: normal; font-size: 12px; text-transform: uppercase; letter-spacing: .12em; color: var(--accent-ink); margin-bottom: 6px; }
+  .allerg { display: flex; flex-wrap: wrap; gap: 6px; }
+  .allerg span { background: #fbeee2; color: #8a4c12; font-weight: 700; font-size: 12.5px; padding: 5px 10px; border-radius: 999px; }
+  .spicy { color: #d1892f; letter-spacing: 2px; }
+  .pairing { display: grid; grid-template-columns: 80px 1fr; gap: 14px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 14px 16px; }
+  .pairing img { width: 80px; height: 80px; border-radius: 12px; object-fit: cover; }
+  .pairing b { font-family: var(--font-head); font-size: 17px; display: block; }
+  .pairing span { font-size: 13px; color: var(--muted); }
+  .qty-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 0; }
+  .note-in { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; font: inherit; font-size: 13.5px; background: var(--surface); resize: vertical; min-height: 60px; }
+</style>
+</head>
+<body class="theme-resto" data-theme-key="resto">
+  <header class="topbar dark">
+    <div class="wrap">
+      <a class="brand" href="restaurant.html"><span class="dot">B</span><span>Brasserie du Vieux-Port<small>Marseille · POS Ulyses by Septeo</small></span></a>
+      <nav class="nav">
+        <a href="restaurant.html#carte">La carte</a>
+        <a href="restaurant.html#reserver">Réserver</a>
+        <button class="cartbtn" id="open-cart">🧾 Addition <span class="count" id="cart-count">0</span></button>
+        <a class="cta" href="operations.html">Console</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap" id="root"></main>
+
+  <footer class="footer"><div class="wrap"><span>Brasserie du Vieux-Port · 32 quai du Port, Marseille · démo sandbox</span><span>POS Ulyses · Asterio — Septeo Hospitality</span></div></footer>
+
+  <script src="themes.js"></script>
+  <script src="theme-switcher.js"></script>
+  <script src="common.js"></script>
+  <script src="checkout.js"></script>
+  <script src="site.js"></script>
+  <script src="data/resto.js"></script>
+  <script>
+    (function () {
+      var D = window.DATA_RST, S = window.SITE, root = document.getElementById('root');
+      var id = S.qs('id') || 'bouilla';
+      var P = D.dishes.filter(function (d) { return d.id === id; })[0];
+      if (!P) { root.innerHTML = '<div class="empty-state" style="margin:60px 0"><div class="e-ico">🍽️</div><h2>Plat introuvable</h2><p><a href="restaurant.html#carte">Retour à la carte</a></p></div>'; return; }
+      document.title = P.name + ' — Brasserie du Vieux-Port';
+      var cat = D.categories.filter(function (c) { return c.id === P.cat; })[0];
+      var pairDish = D.dishes.filter(function (d) { return d.cat === 'boissons' && P.pairing.toLowerCase().indexOf(d.name.split(',')[0].split(' ')[0].toLowerCase()) > -1; })[0] || D.dishes.filter(function (d) { return d.id === 'rose'; })[0];
+      var related = D.dishes.filter(function (d) { return d.id !== P.id && (d.cat === P.cat || (P.cat !== 'boissons' && d.cat === 'boissons' && d.popular)); }).slice(0, 3);
+      var qty = 1, note = '';
+
+      root.innerHTML =
+        '<nav class="crumbs"><a href="index.html">Univers</a><span class="sep">›</span><a href="restaurant.html">Brasserie du Vieux-Port</a><span class="sep">›</span><a href="restaurant.html#cat-' + P.cat + '">' + S.esc(cat.name) + '</a><span class="sep">›</span><b>' + S.esc(P.name) + '</b></nav>' +
+        '<div class="dish-hero">' +
+          '<div class="ph"><img src="' + P.img + '" alt="' + S.esc(P.name) + '">' + (P.popular ? '<span class="badge acc pop">★ Populaire</span>' : '') + '</div>' +
+          '<div><span class="eyebrow">' + S.esc(cat.name) + ' · ' + S.esc(cat.sub) + '</span><h1>' + S.esc(P.name) + '</h1><div class="price">' + S.euros(P.price) + '</div><p class="desc">' + S.esc(P.desc) + '</p>' +
+            '<div class="chips">' + P.tags.map(function (t) { return '<span class="chip-t acc">' + S.esc(t) + '</span>'; }).join('') + '</div></div>' +
+        '</div>' +
+        '<div class="fiche-grid">' +
+          '<div class="fiche-main">' +
+            (P.story ? '<div class="story" data-reveal><b>Le mot du chef</b>' + S.esc(P.story) + '</div>' : '') +
+            '<section data-reveal><h2>En cuisine</h2><div class="specs">' +
+              '<div class="spec"><span class="s-ico">🌍</span><div><div class="s-lab">Origine</div><div class="s-val">' + S.esc(P.origin) + '</div></div></div>' +
+              '<div class="spec"><span class="s-ico">⏱️</span><div><div class="s-lab">Préparation</div><div class="s-val">' + P.time + ' min</div></div></div>' +
+              (P.kcal ? '<div class="spec"><span class="s-ico">🔥</span><div><div class="s-lab">Énergie</div><div class="s-val">' + P.kcal + ' kcal</div></div></div>' : '') +
+              '<div class="spec"><span class="s-ico">🌶️</span><div><div class="s-lab">Piquant</div><div class="s-val spicy">' + (P.spicy ? '🌶️'.repeat(P.spicy) : 'Doux') + '</div></div></div>' +
+            '</div></section>' +
+            '<section data-reveal><h2>Allergènes</h2>' + (P.allergens.length ? '<div class="allerg">' + P.allergens.map(function (a) { return '<span>⚠ ' + S.esc(a) + '</span>'; }).join('') + '</div><p class="hint" style="margin-top:8px">Liste établie selon le règlement INCO. Signalez toute allergie au serveur ou dans le champ « Allergies » du parcours de paiement : l’information voyage avec la commande.</p>' : '<p class="muted">Aucun allergène majeur déclaré.</p>') + '</section>' +
+            '<section data-reveal><h2>L’accord du sommelier</h2><div class="pairing"><img src="' + pairDish.img + '" alt=""><div><b>' + S.esc(P.pairing) + '</b><span>' + S.esc(pairDish.desc) + '</span><div style="margin-top:6px"><button class="btn sm ghost" data-add data-id="' + pairDish.id + '" data-name="' + S.esc(pairDish.name) + '" data-price="' + pairDish.price + '" data-img="' + pairDish.img + '">+ Ajouter (' + S.euros(pairDish.price) + ')</button></div></div></div></section>' +
+            '<section data-reveal><h2>Vous aimerez aussi</h2><div class="menu-list">' + related.map(function (d) { return '<a class="menu-item" href="restaurant-plat.html?id=' + d.id + '"><img src="' + d.img + '" alt=""><div><div class="mi-line"><span class="mi-name">' + S.esc(d.name) + '</span><span class="mi-dots"></span><span class="mi-price">' + S.euros(d.price) + '</span></div><div class="mi-desc">' + S.esc(d.desc) + '</div></div></a>'; }).join('') + '</div></section>' +
+          '</div>' +
+          '<aside class="book-card" id="book"></aside>' +
+        '</div>';
+
+      function renderBook() {
+        var box = document.getElementById('book'), total = P.price * qty;
+        box.innerHTML = '<div class="bc-price"><b>' + S.euros(P.price) + '</b><span>l’unité</span></div>' +
+          '<div class="qty-row"><span class="lab" style="color:var(--muted);font-size:14px">Quantité</span><div class="stepper"><button type="button" id="q-minus">−</button><span>' + qty + '</span><button type="button" id="q-plus">+</button></div></div>' +
+          '<div class="hint" style="margin-bottom:6px">Précisions pour la cuisine</div><textarea class="note-in" id="q-note" placeholder="Cuisson, sans oignon, allergie…">' + S.esc(note) + '</textarea>' +
+          '<div class="bc-total"><span>Total<small>' + qty + ' × ' + S.esc(P.name) + '</small></span><span>' + S.euros(total) + '</span></div>' +
+          '<div class="actions"><button class="btn accent" id="add-bill">🧾 Ajouter à l’addition</button><button class="btn" id="pay-now">Commander & régler — ' + S.euros(total) + '</button></div>' +
+          '<div class="how"><b>Ajouter à l’addition</b> alimente le panier de la table (réglé en une fois). <b>Commander & régler</b> encaisse ce plat tout de suite, comme au comptoir (capture immédiate).</div>' +
+          '<div class="pbs-slot" data-pbs="compact"></div>';
+        S.brand();
+        document.getElementById('q-minus').onclick = function () { qty = Math.max(1, qty - 1); renderBook(); };
+        document.getElementById('q-plus').onclick = function () { qty = Math.min(12, qty + 1); renderBook(); };
+        document.getElementById('q-note').oninput = function () { note = this.value; };
+        document.getElementById('add-bill').onclick = function () { for (var i = 0; i < qty; i++) PMS.addToCart({ id: P.id, name: P.name, price: P.price, img: P.img }); S.toast(qty + ' × ' + P.name + ' ajouté(s) à l’addition', 'ok'); };
+        document.getElementById('pay-now').onclick = function () { PMS.checkout({ mode: 'immediate', amount: total, itemLabel: 'Commande — ' + qty + ' × ' + P.name, summary: [[qty + ' × ' + P.name, S.euros(total)]].concat(note ? [['Précisions', note]] : []), prefill: { covers: '1', service: new Date().getHours() < 16 ? 'Midi' : 'Soir', date: S.today(0), allergies: note } }); };
+      }
+      renderBook();
+      S.reveal();
+    })();
+  </script>
+</body>
+</html>

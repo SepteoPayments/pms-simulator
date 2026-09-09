@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Maisons du Littoral — Locations de vacances · villas, appartements, chalets</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="styles.css" /><link rel="stylesheet" href="ui.css" /><link rel="stylesheet" href="skins.css" />
+<link rel="stylesheet" href="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.68.0/adyen.css" />
+<script src="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.68.0/adyen.js"></script>
+<style>
+  .l-hero { min-height: 70vh; display: flex; align-items: center; }
+  .l-hero .inner { padding: 70px 0 120px; }
+  .l-hero h1 { font-size: clamp(36px, 5.5vw, 64px); font-weight: 700; max-width: 18ch; letter-spacing: -.02em; }
+  .searchbar { position: relative; z-index: 3; margin: -70px auto 0; max-width: 1040px; background: var(--surface); border-radius: 22px; box-shadow: 0 24px 60px rgba(14,107,116,.22); display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr auto; padding: 8px; gap: 6px; border: 1px solid var(--line); }
+  .searchbar label { display: flex; flex-direction: column; gap: 2px; padding: 10px 16px; border-radius: 16px; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 700; transition: background .15s; }
+  .searchbar label:hover { background: var(--bg); }
+  .searchbar input, .searchbar select { border: none; font: inherit; font-size: 15px; color: var(--ink); background: transparent; padding: 0; outline: none; font-weight: 500; }
+  .searchbar button { border: none; background: var(--accent); color: #fff; font: inherit; font-weight: 700; font-size: 15px; padding: 0 26px; border-radius: 16px; cursor: pointer; transition: transform .15s, filter .15s; }
+  .searchbar button:hover { filter: brightness(1.06); transform: scale(1.02); }
+  @media (max-width: 900px) { .searchbar { grid-template-columns: 1fr 1fr; margin-top: -30px; } .searchbar button { grid-column: 1 / -1; padding: 14px; } }
+  .region-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+  .region-tabs button { border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 9px 16px; font: inherit; font-size: 13.5px; font-weight: 600; color: var(--muted); cursor: pointer; display: inline-flex; gap: 6px; align-items: center; transition: all .15s; }
+  .region-tabs button.on { background: var(--brand); color: #fff; border-color: var(--brand); }
+  .prop-card .c-photo { aspect-ratio: 4/3; }
+  .prop-card .c-specs { display: flex; gap: 12px; font-size: 12.5px; color: var(--muted); flex-wrap: wrap; }
+  .prop-card .c-specs span::before { content: attr(data-ico); margin-right: 4px; }
+  .prop-card .where { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 4px; }
+  .how3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .how3 .h { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 24px; position: relative; overflow: hidden; }
+  .how3 .h::after { content: attr(data-pct); position: absolute; right: 16px; top: 10px; font-family: var(--font-head); font-weight: 700; font-size: 54px; color: color-mix(in srgb, var(--accent) 12%, transparent); line-height: 1; }
+  .how3 .h .ico { width: 44px; height: 44px; border-radius: 14px; background: color-mix(in srgb, var(--brand) 10%, var(--surface)); display: grid; place-items: center; font-size: 22px; margin-bottom: 12px; }
+  .how3 .h b { display: block; font-family: var(--font-head); font-size: 18px; margin-bottom: 4px; color: var(--brand); }
+  .how3 .h span { font-size: 13.5px; color: var(--muted); line-height: 1.5; }
+  .how3 .h .mode { display: inline-block; margin-top: 12px; font-size: 11px; font-weight: 700; color: #fff; background: var(--brand-2); padding: 4px 10px; border-radius: 999px; }
+  @media (max-width: 800px) { .how3 { grid-template-columns: 1fr; } }
+  .host { display: grid; grid-template-columns: 120px 1fr; gap: 20px; align-items: center; background: linear-gradient(135deg, #0e6b74, #14929e); color: #fff; border-radius: 22px; padding: 26px 28px; }
+  .host img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid rgba(255,255,255,.4); }
+  .host h3 { margin: 0 0 4px; font-size: 22px; color: #fff; }
+  .host p { margin: 0; color: rgba(255,255,255,.85); font-size: 14px; }
+  .host .h-stats { display: flex; gap: 18px; margin-top: 12px; flex-wrap: wrap; }
+  .host .h-stats div b { display: block; font-size: 20px; font-family: var(--font-head); }
+  .host .h-stats div span { font-size: 12px; opacity: .8; }
+</style>
+</head>
+<body class="theme-location" data-theme-key="location">
+  <header class="topbar">
+    <div class="wrap">
+      <a class="brand" href="location.html"><span class="dot">M</span><span>Maisons du Littoral<small>Conciergerie · Resalys by Septeo</small></span></a>
+      <nav class="nav">
+        <a href="#logements">Logements</a>
+        <a href="#comment">Comment ça marche</a>
+        <a class="cta" href="operations.html">Console d'opérations</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero l-hero">
+    <div class="bg" style="background-image:url('img/loc-hero.jpg')"></div>
+    <div class="scrim"></div>
+    <div class="wrap inner">
+      <span class="eyebrow" style="color:#bfe6e9">Conciergerie · Atlantique, Alpes & villes</span>
+      <h1>Des maisons qu’on a envie d’habiter</h1>
+      <p>Villas, appartements vue mer, chalets, lofts : sélectionnés et gérés par notre conciergerie. <strong>Acompte de 30 %</strong> à la réservation, <strong>solde à J-30</strong>, <strong>dépôt de garantie pré-autorisé</strong> à l’arrivée — jamais débité si tout va bien.</p>
+      <div class="pills"><span class="pill">Acompte 30 %</span><span class="pill">Solde à J-30</span><span class="pill">Caution sans débit</span><span class="pill">Annulation flexible</span></div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <form class="searchbar" id="search">
+      <label>Destination<select id="s-region"><option value="">Toutes</option><option>Atlantique</option><option>Alpes</option><option>Ville</option></select></label>
+      <label>Arrivée<input type="date" id="s-in"></label>
+      <label>Départ<input type="date" id="s-out"></label>
+      <label>Voyageurs<select id="s-guests"><option value="2">2 voyageurs</option><option value="4" selected>4 voyageurs</option><option value="6">6 voyageurs</option><option value="8">8 voyageurs</option><option value="10">10 voyageurs</option></select></label>
+      <button type="submit">Rechercher</button>
+    </form>
+  </div>
+
+  <main class="wrap">
+    <section class="section" id="logements">
+      <div class="sec-head"><div><span class="eyebrow">Nos logements</span><h2>Choisissez votre maison de vacances</h2><p class="lead" id="lead">Prix affichés pour vos dates, ménage inclus. Cliquez pour voir la fiche complète : photos, équipements, carte, calendrier et avis.</p></div><span class="badge soft" id="s-summary"></span></div>
+      <div class="region-tabs" id="regions"></div>
+      <div class="cards" id="props"></div>
+    </section>
+
+    <section class="section" id="comment">
+      <div class="sec-head"><div><span class="eyebrow">Comment ça marche</span><h2>Trois paiements, zéro stress</h2><p class="lead">Resalys planifie les trois moments de paiement et Payments by Septeo les exécute — le voyageur ne fait qu’un seul parcours.</p></div></div>
+      <div class="how3">
+        <div class="h" data-pct="30%" data-reveal><div class="ico">📅</div><b>Acompte à la réservation</b><span>30 % du séjour encaissés immédiatement : le logement est bloqué, la conciergerie prépare l’arrivée.</span><span class="mode">Paiement immédiat</span></div>
+        <div class="h" data-pct="70%" data-reveal style="--i:1"><div class="ico">💳</div><b>Solde à J-30</b><span>Le solde est réglé un mois avant l’arrivée, en un clic depuis l’e-mail de rappel (ou prélevé sur le moyen enregistré).</span><span class="mode">Paiement immédiat</span></div>
+        <div class="h" data-pct="🔒" data-reveal style="--i:2"><div class="ico">🛡️</div><b>Dépôt de garantie à l’arrivée</b><span>Une empreinte est pré-autorisée sur la carte : rien n’est débité. Libérée après l’état des lieux, ou capturée partiellement en cas de dégâts.</span><span class="mode">Caution · pré-autorisation</span></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="host" data-reveal>
+        <img src="img/tr-agent.jpg" alt="">
+        <div>
+          <span class="eyebrow" style="color:#bfe6e9">Votre conciergerie</span>
+          <h3>Camille Berthier & l’équipe Maisons du Littoral</h3>
+          <p>Nous sélectionnons chaque maison, l’équipons et vous accueillons en personne. Une question, une clé perdue, une table à réserver : on est là, 7 j/7.</p>
+          <div class="h-stats"><div><b>4,85</b><span>note moyenne · 3 120 avis</span></div><div><b>&lt; 1 h</b><span>délai de réponse</span></div><div><b>2018</b><span>conciergerie depuis</span></div><div><b>98 %</b><span>cautions libérées intactes</span></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="dt-band" data-reveal>
+        <div>
+          <span class="eyebrow" style="color:#bfe6e9">Data travel</span>
+          <h2>Ce que le paiement raconte</h2>
+          <p>Dates, nombre de voyageurs, motif (vacances, télétravail…), heure d’arrivée : autant de données qui accompagnent chaque acompte, chaque solde et chaque caution. Résultat : taux d’annulation par saison, panier moyen par type de logement, cautions capturées par segment.</p>
+          <div data-pbs></div>
+        </div>
+        <div class="dt-json" id="dt-json"></div>
+      </div>
+    </section>
+
+    <section class="section"><p class="note">Démo sandbox — carte de test <strong>4111 1111 1111 1111</strong> · 03/30 · 737. Capture partielle ou libération de la caution dans la <a href="operations.html">console d'opérations</a>.</p></section>
+  </main>
+
+  <footer class="footer"><div class="wrap"><span>Maisons du Littoral · La Rochelle · démo sandbox</span><span>Resalys — Septeo Hospitality</span></div></footer>
+
+  <script src="themes.js"></script>
+  <script src="theme-switcher.js"></script>
+  <script src="common.js"></script>
+  <script src="checkout.js"></script>
+  <script src="site.js"></script>
+  <script src="data/location.js"></script>
+  <script>
+    (function () {
+      var D = window.DATA_LOC, S = window.SITE;
+      var inEl = document.getElementById('s-in'), outEl = document.getElementById('s-out'), gEl = document.getElementById('s-guests'), rEl = document.getElementById('s-region');
+      var d0 = new Date(); var toSat = (6 - d0.getDay() + 7) % 7 || 7;
+      inEl.value = S.qs('in') || S.today(toSat + 14); outEl.value = S.qs('out') || S.addDays(inEl.value, 7); if (S.qs('guests')) gEl.value = S.qs('guests'); inEl.min = S.today(0);
+      var region = '';
+      var regions = ['Toutes', 'Atlantique', 'Alpes', 'Ville'], ICO = { Toutes: '🧭', Atlantique: '🌊', Alpes: '🏔️', Ville: '🏙️' };
+      document.getElementById('regions').innerHTML = regions.map(function (r) { return '<button type="button" data-r="' + (r === 'Toutes' ? '' : r) + '" class="' + (r === 'Toutes' ? 'on' : '') + '">' + ICO[r] + ' ' + r + '</button>'; }).join('');
+      document.querySelectorAll('#regions button').forEach(function (b) { b.onclick = function () { region = b.getAttribute('data-r'); rEl.value = region; document.querySelectorAll('#regions button').forEach(function (x) { x.classList.toggle('on', x === b); }); render(); }; });
+      rEl.onchange = function () { region = rEl.value; document.querySelectorAll('#regions button').forEach(function (x) { x.classList.toggle('on', x.getAttribute('data-r') === region); }); render(); };
+
+      function isHigh(iso) { var m = Number(iso.slice(5, 7)); return m === 7 || m === 8 || m === 12 || m === 2; }
+      function stayPrice(p, a, b) { var t = 0; for (var c = a; c < b; c = S.addDays(c, 1)) t += p.night + (isHigh(c) ? p.highSeasonPlus : 0); return t; }
+
+      function render() {
+        var a = inEl.value, b = outEl.value, n = S.nights(a, b), g = Number(gEl.value);
+        if (n < 1) { outEl.value = S.addDays(a, 2); return render(); }
+        document.getElementById('s-summary').textContent = n + ' nuits · ' + g + ' voyageurs · ' + S.fmtDate(a) + ' → ' + S.fmtDate(b);
+        var list = D.properties.filter(function (p) { return !region || p.region === region; });
+        var host = document.getElementById('props');
+        if (!list.length) { host.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="e-ico">🏝️</div>Aucun logement dans cette destination pour l’instant.</div>'; return; }
+        host.innerHTML = list.map(function (p, i) {
+          var stay = stayPrice(p, a, b), total = stay + p.cleaning, tooSmall = p.guests < g, tooShort = n < p.minNights;
+          var link = 'location-logement.html?id=' + p.id + '&in=' + a + '&out=' + b + '&guests=' + g;
+          return '<a class="card prop-card" href="' + link + '" data-reveal style="--i:' + i + '">' +
+            '<div class="c-photo"><img src="' + p.photos[0][0] + '" alt="' + S.esc(p.name) + '" loading="lazy"><div class="badges"><span class="badge acc">' + S.esc(p.badge) + '</span>' + (p.superhost ? '<span class="badge">★ Conciergerie Plus</span>' : '') + (tooSmall ? '<span class="badge warn">Max ' + p.guests + ' pers.</span>' : '') + (tooShort ? '<span class="badge warn">Min ' + p.minNights + ' nuits</span>' : '') + '</div><span class="c-fav">♡</span><span class="c-count">📷 ' + p.photos.length + '</span></div>' +
+            '<div class="c-body"><div class="where">📍 ' + S.esc(p.where) + '</div><div class="c-title"><h3>' + S.esc(p.name) + '</h3><span style="white-space:nowrap">' + S.stars(p.rating) + '</span></div>' +
+            '<div class="c-specs"><span data-ico="👥">' + p.guests + ' voy.</span><span data-ico="🛏️">' + p.bedrooms + ' ch.</span><span data-ico="🛁">' + p.baths + ' sdb</span><span data-ico="📐">' + p.size + ' m²</span></div>' +
+            '<p class="c-desc">' + S.esc(p.tagline) + '.</p>' +
+            '<div class="c-foot"><div class="c-price">' + S.euros(total) + '<small>' + n + ' nuits · ménage inclus · dès ' + S.euros(p.night) + '/nuit</small></div><span class="c-go">Voir la fiche</span></div></div></a>';
+        }).join('');
+        S.reveal();
+        var j = { shopper: { firstName: 'Juliette', lastName: 'Moreau', email: 'juliette.moreau@example.fr', billingAddress: { city: 'Lyon', country: 'FR' } }, metadata: { vertical: 'location', property: list[0].name, checkIn: a, checkOut: b, nights: n, guests: g, purpose: 'Vacances', arrival: '15h – 17h', step: 'acompte 30 %' } };
+        document.getElementById('dt-json').innerHTML = JSON.stringify(j, null, 2).replace(/"([^"]+)":/g, '<span class="k">"$1"</span>:').replace(/: "([^"]*)"/g, ': <span class="s">"$1"</span>').replace(/: (\d+)/g, ': <span class="n">$1</span>');
+      }
+      document.getElementById('search').addEventListener('submit', function (e) { e.preventDefault(); render(); document.getElementById('logements').scrollIntoView({ behavior: 'smooth' }); });
+      [inEl, outEl, gEl].forEach(function (el) { el.addEventListener('change', render); });
+      render();
+    })();
+  </script>
+</body>
+</html>

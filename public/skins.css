@@ -1,0 +1,268 @@
+/* =========================================================
+   skins.css — une personnalité par métier (palette, typo, détails)
+   Chaque .theme-* redéfinit les variables de styles.css/ui.css et
+   ajoute quelques touches signature (boutons, badges, cartes, hero).
+   ========================================================= */
+
+/* ---------------- 🏨 HÔTEL — Le Rivage : luxe balnéaire, serif Cormorant, or & navy ---------------- */
+.theme-hotel { --brand:#14324f; --brand-2:#294b68; --accent:#b7885a; --accent-ink:#7a5227; --bg:#f8f5f0; --surface:#fffdf9; --ink:#20272f; --muted:#6f6a63; --line:#e8dfd2; --radius:10px;
+  --font-head:'Cormorant Garamond', Georgia, 'Times New Roman', serif; --font-body:'Jost', 'Segoe UI', sans-serif; --bar-bg: rgba(20,50,79,.92); --gradient: linear-gradient(135deg,#14324f,#294b68); }
+.theme-hotel body, body.theme-hotel { font-family: var(--font-body); font-weight: 400; }
+.theme-hotel h1, .theme-hotel h2, .theme-hotel h3 { font-family: var(--font-head); font-weight: 600; letter-spacing: -.005em; }
+.theme-hotel .topbar { background: var(--bar-bg); border-bottom: 1px solid rgba(255,255,255,.08); }
+.theme-hotel .topbar .brand, .theme-hotel .topbar .nav a, .theme-hotel .topbar .tsw > button, .theme-hotel .topbar .pbs { color: #fff; }
+.theme-hotel .topbar .brand small { color: rgba(255,255,255,.65); }
+.theme-hotel .topbar .brand .dot { background: var(--accent); color: #fff; border-radius: 4px; font-family: var(--font-head); }
+.theme-hotel .topbar .tsw > button { border-color: rgba(255,255,255,.25); }
+.theme-hotel .topbar .nav .cta { background: var(--accent); }
+.theme-hotel .topbar .pbs-top { border-left-color: rgba(255,255,255,.18); }
+.theme-hotel .eyebrow { letter-spacing: .22em; font-size: 11px; color: var(--accent); }
+.theme-hotel .eyebrow::before { content: ''; display: inline-block; width: 26px; height: 1px; background: var(--accent); vertical-align: middle; margin-right: 10px; }
+.theme-hotel .btn { border-radius: 4px; letter-spacing: .04em; text-transform: uppercase; font-size: 13px; font-weight: 500; }
+.theme-hotel .btn.accent { background: var(--accent); }
+.theme-hotel .card { border-radius: 8px; }
+.theme-hotel .card h3 { font-size: 22px; }
+.theme-hotel .badge.acc { background: var(--accent); border-radius: 3px; letter-spacing: .08em; text-transform: uppercase; font-size: 10.5px; }
+.theme-hotel .hero .scrim { background: linear-gradient(180deg, rgba(20,50,79,.25), rgba(20,50,79,.78)); }
+.theme-hotel .hero h1 { font-weight: 500; font-style: italic; }
+.theme-hotel .section h2 { font-size: 34px; }
+.theme-hotel .book-card { border-top: 3px solid var(--accent); border-radius: 8px; }
+.theme-hotel .stars .star.on { color: var(--accent); }
+.theme-hotel .review .avatar { background: var(--brand); }
+.theme-hotel .rule::before, .theme-hotel .rule::after { background: var(--accent); opacity: .4; }
+.theme-hotel .footer { background: var(--brand); color: rgba(255,255,255,.75); border-top: none; padding: 40px 0; margin-top: 60px; }
+.theme-hotel .footer .pbs { color: #fff; }
+
+/* ---------------- ⛺ CAMPING — Les Flots Bleus : ludique, arrondi, vert forêt & orange soleil ---------------- */
+.theme-camping { --brand:#2c5a3a; --brand-2:#3f8f5a; --accent:#f08a2e; --accent-ink:#8a4c12; --bg:#f4f7f0; --surface:#ffffff; --ink:#1f2a22; --muted:#66756a; --line:#dde6d8; --radius:20px;
+  --font-head:'Fredoka', 'Trebuchet MS', sans-serif; --font-body:'Nunito', 'Segoe UI', sans-serif; --bar-bg:#fff; --gradient: linear-gradient(135deg,#2c5a3a,#3f8f5a); }
+body.theme-camping { font-family: var(--font-body); font-weight: 500; }
+.theme-camping h1, .theme-camping h2, .theme-camping h3 { font-family: var(--font-head); font-weight: 600; }
+.theme-camping .topbar { background: rgba(255,255,255,.92); }
+.theme-camping .topbar .brand .dot { background: var(--accent); border-radius: 50% 50% 50% 8px; }
+.theme-camping .topbar .nav .cta { background: var(--brand-2); border-radius: 999px; }
+.theme-camping .btn { border-radius: 999px; font-weight: 700; }
+.theme-camping .btn.accent { background: var(--accent); color: #fff; }
+.theme-camping .btn.ghost { background: #e8f0e4; }
+.theme-camping .badge { border-radius: 999px; }
+.theme-camping .badge.acc { background: var(--accent); }
+.theme-camping .card { border-radius: 22px; border-width: 2px; }
+.theme-camping .card:hover { border-color: var(--accent); }
+.theme-camping .hero .scrim { background: linear-gradient(180deg, rgba(20,50,30,.15), rgba(20,50,30,.75)); }
+.theme-camping .hero h1 { font-weight: 700; }
+.theme-camping .pill { background: rgba(255,255,255,.22); border-radius: 999px; font-weight: 700; }
+.theme-camping .eyebrow { color: var(--brand-2); letter-spacing: .1em; }
+.theme-camping .spec, .theme-camping .option, .theme-camping .review, .theme-camping .doc { border-radius: 16px; }
+.theme-camping .steps li::before, .theme-camping .timeline .t-dot { border-radius: 50%; }
+.theme-camping .book-card { border-radius: 24px; border: 2px solid var(--line); box-shadow: 0 12px 40px rgba(44,90,58,.12); }
+.theme-camping .kpi { border-radius: 18px; }
+.theme-camping .footer { background: var(--brand); color: rgba(255,255,255,.75); border-top: none; padding: 40px 0; margin-top: 60px; border-radius: 40px 40px 0 0; }
+.theme-camping .footer .pbs { color: #fff; }
+.theme-camping .review .avatar { background: var(--brand-2); }
+/* motif « sapins » discret en fond de section */
+.theme-camping .section.alt { background: var(--surface); border-radius: 30px; padding: 34px 30px; margin: 20px 0; border: 2px dashed var(--line); }
+
+/* ---------------- 💆 SPA — Émeraude : apaisant, sauge & sable, Marcellus ---------------- */
+.theme-spa { --brand:#2f6b53; --brand-2:#4f8f6f; --accent:#c59b6a; --accent-ink:#6a4e28; --bg:#f6f7f3; --surface:#fffefb; --ink:#23302a; --muted:#6b776f; --line:#e3e8df; --radius:18px;
+  --font-head:'Marcellus', Georgia, serif; --font-body:'Mulish', 'Segoe UI', sans-serif; --bar-bg: rgba(246,247,243,.92); --gradient: linear-gradient(135deg,#2f6b53,#4f8f6f); }
+body.theme-spa { font-family: var(--font-body); }
+.theme-spa h1, .theme-spa h2, .theme-spa h3 { font-family: var(--font-head); font-weight: 400; letter-spacing: .01em; }
+.theme-spa .topbar { background: var(--bar-bg); }
+.theme-spa .topbar .brand .dot { background: var(--brand); border-radius: 50%; font-family: var(--font-head); }
+.theme-spa .topbar .nav .cta { background: var(--brand); border-radius: 999px; }
+.theme-spa .cartbtn { border-radius: 999px; }
+.theme-spa .btn { border-radius: 999px; font-weight: 600; letter-spacing: .02em; }
+.theme-spa .btn.accent { background: var(--accent); }
+.theme-spa .btn.ghost { background: #edf0e8; }
+.theme-spa .eyebrow { color: var(--brand-2); letter-spacing: .22em; font-weight: 600; font-size: 11px; }
+.theme-spa .hero .scrim { background: linear-gradient(180deg, rgba(30,50,40,.2), rgba(30,50,40,.72)); }
+.theme-spa .hero h1 { font-weight: 400; }
+.theme-spa .card { border-radius: 22px; }
+.theme-spa .card .c-photo { border-radius: 22px 22px 0 0; }
+.theme-spa .badge.acc { background: var(--brand); border-radius: 999px; }
+.theme-spa .section h2 { font-size: 32px; }
+.theme-spa .book-card { border-radius: 24px; background: linear-gradient(180deg, #fffefb, #f7f8f3); }
+.theme-spa .steps li::before { background: var(--brand); }
+.theme-spa .review .avatar { background: var(--brand-2); }
+.theme-spa .spec { border-radius: 16px; background: #fbfbf7; }
+.theme-spa .footer { background: #1f4a39; color: rgba(255,255,255,.75); border-top: none; padding: 40px 0; margin-top: 60px; }
+.theme-spa .footer .pbs { color: #fff; }
+
+/* ---------------- 🏖️ LOCATION — Maisons du Littoral : frais, lagon & corail, Poppins ---------------- */
+.theme-loc, .theme-location { --brand:#0e6b74; --brand-2:#14929e; --accent:#ef6f53; --accent-ink:#9a3a22; --bg:#f2f8f8; --surface:#ffffff; --ink:#18282a; --muted:#607778; --line:#d9e6e6; --radius:16px;
+  --font-head:'Poppins', 'Trebuchet MS', sans-serif; --font-body:'DM Sans', 'Segoe UI', sans-serif; --bar-bg: rgba(255,255,255,.92); --gradient: linear-gradient(135deg,#0e6b74,#14929e); }
+body.theme-location { font-family: var(--font-body); }
+.theme-location h1, .theme-location h2, .theme-location h3 { font-family: var(--font-head); font-weight: 600; letter-spacing: -.01em; }
+.theme-location .topbar .brand .dot { background: var(--accent); border-radius: 12px 12px 12px 3px; }
+.theme-location .topbar .nav .cta { background: var(--brand); border-radius: 12px; }
+.theme-location .btn { border-radius: 12px; font-weight: 600; }
+.theme-location .btn.accent { background: var(--accent); }
+.theme-location .btn.ghost { background: #e6f0f0; }
+.theme-location .eyebrow { color: var(--brand-2); }
+.theme-location .hero .scrim { background: linear-gradient(180deg, rgba(14,107,116,.15), rgba(10,40,45,.78)); }
+.theme-location .badge.acc { background: var(--accent); }
+.theme-location .card { border-radius: 18px; }
+.theme-location .card .c-fav { color: var(--accent); }
+.theme-location .book-card { border-radius: 20px; box-shadow: 0 16px 50px rgba(14,107,116,.14); }
+.theme-location .review .avatar { background: var(--brand-2); }
+.theme-location .cal-grid .day.start, .theme-location .cal-grid .day.end { background: var(--brand); }
+.theme-location .footer { background: var(--brand); color: rgba(255,255,255,.75); border-top: none; padding: 40px 0; margin-top: 60px; }
+.theme-location .footer .pbs { color: #fff; }
+
+/* ---------------- 🏠 GESTION LOCATIVE — Bellecour Gestion : fintech clair, bleu électrique, Manrope, tabulaire ---------------- */
+.theme-gestion, .theme-immo { --brand:#1d3a8a; --brand-2:#2f5fd0; --accent:#2f5fd0; --accent-ink:#1d3a8a; --bg:#f4f6fb; --surface:#ffffff; --ink:#172033; --muted:#5f6b85; --line:#e1e6f2; --radius:14px;
+  --font-head:'Manrope', 'Segoe UI', sans-serif; --font-body:'Manrope', 'Segoe UI', sans-serif; --bar-bg:#fff; --gradient: linear-gradient(135deg,#1d3a8a,#2f5fd0); }
+body.theme-gestion { font-family: var(--font-body); }
+.theme-gestion h1, .theme-gestion h2, .theme-gestion h3 { font-family: var(--font-head); font-weight: 800; letter-spacing: -.02em; }
+.theme-gestion .topbar .brand .dot { background: var(--accent); border-radius: 8px; }
+.theme-gestion .topbar .nav .cta { background: var(--brand); }
+.theme-gestion .btn { border-radius: 10px; font-weight: 700; }
+.theme-gestion .btn.accent { background: var(--accent); }
+.theme-gestion .btn.ghost { background: #e9eefb; color: var(--brand); }
+.theme-gestion .eyebrow { color: var(--accent); letter-spacing: .08em; }
+.theme-gestion .hero .scrim { background: linear-gradient(90deg, rgba(29,58,138,.88) 0%, rgba(29,58,138,.55) 60%, rgba(29,58,138,.25) 100%); }
+.theme-gestion .hero .inner { padding: 60px 0 50px; }
+.theme-gestion .badge.acc { background: var(--accent); }
+.theme-gestion .kpi .k-val { font-family: var(--font-body); }
+.theme-gestion .dtable th { background: #f7f9fe; }
+.theme-gestion .card { border-radius: 16px; }
+.theme-gestion .tabs button.on { color: var(--accent); }
+.theme-gestion .footer { background: #0f1f4d; color: rgba(255,255,255,.75); border-top: none; padding: 40px 0; margin-top: 60px; }
+.theme-gestion .footer .pbs { color: #fff; }
+/* portail : barre latérale de compte */
+.portal { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 26px; align-items: start; padding: 26px 0 50px; }
+@media (max-width: 900px) { .portal { grid-template-columns: 1fr; } }
+.portal-side { position: sticky; top: 84px; display: grid; gap: 14px; }
+.portal-me { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 16px; display: flex; gap: 12px; align-items: center; }
+.portal-me .avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--gradient); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 15px; }
+.portal-me b { display: block; font-size: 15px; }
+.portal-me small { color: var(--muted); font-size: 12px; }
+.portal-nav { display: grid; gap: 2px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 8px; }
+.portal-nav button { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; border: none; background: transparent; padding: 10px 12px; border-radius: 10px; font: inherit; font-weight: 600; color: var(--muted); cursor: pointer; font-size: 14px; }
+.portal-nav button:hover { background: var(--bg); color: var(--ink); }
+.portal-nav button.on { background: color-mix(in srgb, var(--accent) 12%, var(--surface)); color: var(--brand); }
+.portal-nav button .n { margin-left: auto; background: var(--accent); color: #fff; font-size: 11px; padding: 1px 7px; border-radius: 999px; }
+.portal-main > * + * { margin-top: 22px; }
+.portal-main h2 { margin: 0 0 4px; font-size: 24px; }
+.portal-main .lead { margin: 0 0 18px; }
+
+/* ---------------- 🏢 SYNDIC — Résidence Le Parc : institutionnel, ardoise & cuivre, Libre Baskerville ---------------- */
+.theme-syndic { --brand:#2c3a52; --brand-2:#51617f; --accent:#b0714a; --accent-ink:#7a4a2a; --bg:#f4f5f7; --surface:#ffffff; --ink:#212733; --muted:#66707f; --line:#dfe3ea; --radius:10px;
+  --font-head:'Libre Baskerville', Georgia, serif; --font-body:'Source Sans 3', 'Segoe UI', sans-serif; --bar-bg:#2c3a52; --gradient: linear-gradient(135deg,#2c3a52,#51617f); }
+body.theme-syndic { font-family: var(--font-body); font-size: 15px; }
+.theme-syndic h1, .theme-syndic h2, .theme-syndic h3 { font-family: var(--font-head); font-weight: 700; }
+.theme-syndic .topbar { background: var(--bar-bg); border-bottom: 1px solid rgba(255,255,255,.08); }
+.theme-syndic .topbar .brand, .theme-syndic .topbar .nav a, .theme-syndic .topbar .tsw > button, .theme-syndic .topbar .pbs { color: #fff; }
+.theme-syndic .topbar .brand small { color: rgba(255,255,255,.65); }
+.theme-syndic .topbar .brand .dot { background: var(--accent); border-radius: 3px; }
+.theme-syndic .topbar .tsw > button { border-color: rgba(255,255,255,.25); }
+.theme-syndic .topbar .nav .cta { background: var(--accent); border-radius: 4px; }
+.theme-syndic .topbar .pbs-top { border-left-color: rgba(255,255,255,.18); }
+.theme-syndic .btn { border-radius: 4px; font-weight: 600; }
+.theme-syndic .btn.accent { background: var(--accent); }
+.theme-syndic .btn.ghost { background: #e8ebf0; }
+.theme-syndic .eyebrow { color: var(--accent); letter-spacing: .16em; }
+.theme-syndic .hero .scrim { background: linear-gradient(180deg, rgba(44,58,82,.35), rgba(44,58,82,.85)); }
+.theme-syndic .card, .theme-syndic .panel-lt, .theme-syndic .kpi, .theme-syndic .dtable-wrap, .theme-syndic .doc, .theme-syndic .review { border-radius: 8px; }
+.theme-syndic .badge.acc { background: var(--accent); border-radius: 3px; }
+.theme-syndic .dtable th { background: #eef0f4; color: var(--brand); }
+.theme-syndic .portal-nav button.on { background: #eef0f4; }
+.theme-syndic .portal-me .avatar { border-radius: 6px; }
+.theme-syndic .footer { background: #1f2a3d; color: rgba(255,255,255,.7); border-top: none; padding: 40px 0; margin-top: 60px; }
+.theme-syndic .footer .pbs { color: #fff; }
+
+/* ---------------- 📄 TRANSACTION — Saint-Jean Immobilier : prestige notarial, encre & or, Playfair ---------------- */
+.theme-transaction { --brand:#1f2a3a; --brand-2:#3a4f68; --accent:#a3742c; --accent-ink:#6c4a14; --bg:#f7f5f1; --surface:#fffdf9; --ink:#1f2630; --muted:#6c6a66; --line:#e6e0d6; --radius:6px;
+  --font-head:'Playfair Display', Georgia, serif; --font-body:'Lato', 'Segoe UI', sans-serif; --bar-bg:#1f2a3a; --gradient: linear-gradient(135deg,#1f2a3a,#3a4f68); }
+body.theme-transaction { font-family: var(--font-body); }
+.theme-transaction h1, .theme-transaction h2, .theme-transaction h3 { font-family: var(--font-head); font-weight: 600; }
+.theme-transaction .topbar { background: var(--bar-bg); border-bottom: 1px solid rgba(255,255,255,.08); }
+.theme-transaction .topbar .brand, .theme-transaction .topbar .nav a, .theme-transaction .topbar .tsw > button, .theme-transaction .topbar .pbs { color: #fff; }
+.theme-transaction .topbar .brand small { color: rgba(255,255,255,.65); }
+.theme-transaction .topbar .brand .dot { background: var(--accent); border-radius: 2px; font-family: var(--font-head); }
+.theme-transaction .topbar .tsw > button { border-color: rgba(255,255,255,.25); }
+.theme-transaction .topbar .nav .cta { background: var(--accent); border-radius: 2px; }
+.theme-transaction .topbar .pbs-top { border-left-color: rgba(255,255,255,.18); }
+.theme-transaction .btn { border-radius: 2px; letter-spacing: .06em; text-transform: uppercase; font-size: 12.5px; font-weight: 700; }
+.theme-transaction .btn.accent { background: var(--accent); }
+.theme-transaction .btn.ghost { background: #eee9e0; }
+.theme-transaction .eyebrow { color: var(--accent); letter-spacing: .24em; font-size: 11px; }
+.theme-transaction .hero .scrim { background: linear-gradient(180deg, rgba(31,42,58,.3), rgba(31,42,58,.85)); }
+.theme-transaction .hero h1 { font-weight: 500; }
+.theme-transaction .card { border-radius: 4px; }
+.theme-transaction .card h3 { font-size: 21px; }
+.theme-transaction .card .c-price { font-family: var(--font-head); font-size: 24px; }
+.theme-transaction .badge.acc { background: var(--accent); border-radius: 2px; text-transform: uppercase; letter-spacing: .08em; font-size: 10.5px; }
+.theme-transaction .book-card { border-radius: 4px; border-top: 3px solid var(--accent); }
+.theme-transaction .spec, .theme-transaction .option, .theme-transaction .doc, .theme-transaction .review, .theme-transaction .kpi, .theme-transaction .panel-lt { border-radius: 4px; }
+.theme-transaction .steps li::before { border-radius: 2px; }
+.theme-transaction .review .avatar { background: var(--brand); border-radius: 4px; }
+.theme-transaction .footer { background: #151d29; color: rgba(255,255,255,.7); border-top: none; padding: 40px 0; margin-top: 60px; }
+.theme-transaction .footer .pbs { color: #fff; }
+/* étiquette DPE */
+.dpe { display: grid; gap: 3px; max-width: 320px; }
+.dpe div { display: grid; grid-template-columns: var(--w) auto; align-items: center; gap: 8px; }
+.dpe div i { display: block; height: 22px; border-radius: 0 6px 6px 0; background: var(--c); color: #fff; font-size: 12px; font-weight: 800; padding-left: 8px; line-height: 22px; font-style: normal; }
+.dpe div.on i { outline: 3px solid var(--ink); outline-offset: 1px; }
+.dpe div.on::after { content: attr(data-val) ' kWh/m²/an'; font-size: 12px; font-weight: 700; }
+
+/* ---------------- 🍽️ RESTAURATION — Brasserie du Vieux-Port : bistrot, bordeaux & crème, Fraunces ---------------- */
+.theme-resto { --brand:#5e2323; --brand-2:#8a3b2e; --accent:#d1892f; --accent-ink:#7a4a1a; --bg:#f9f4ec; --surface:#fffaf2; --ink:#2a1f1b; --muted:#7a6a60; --line:#ebdfd0; --radius:12px;
+  --font-head:'Fraunces', Georgia, serif; --font-body:'Karla', 'Segoe UI', sans-serif; --bar-bg:#5e2323; --gradient: linear-gradient(135deg,#5e2323,#8a3b2e); }
+body.theme-resto { font-family: var(--font-body); }
+.theme-resto h1, .theme-resto h2, .theme-resto h3 { font-family: var(--font-head); font-weight: 600; }
+.theme-resto .topbar { background: var(--bar-bg); border-bottom: 1px solid rgba(255,255,255,.08); }
+.theme-resto .topbar .brand, .theme-resto .topbar .nav a, .theme-resto .topbar .tsw > button, .theme-resto .topbar .pbs { color: #fff; }
+.theme-resto .topbar .brand small { color: rgba(255,255,255,.65); }
+.theme-resto .topbar .brand .dot { background: var(--accent); border-radius: 50%; }
+.theme-resto .topbar .tsw > button { border-color: rgba(255,255,255,.25); }
+.theme-resto .topbar .nav .cta { background: var(--accent); }
+.theme-resto .topbar .pbs-top { border-left-color: rgba(255,255,255,.18); }
+.theme-resto .cartbtn { background: var(--accent); }
+.theme-resto .btn { border-radius: 8px; font-weight: 700; }
+.theme-resto .btn.accent { background: var(--accent); }
+.theme-resto .btn.ghost { background: #f0e4d2; }
+.theme-resto .eyebrow { color: var(--accent); letter-spacing: .18em; }
+.theme-resto .hero .scrim { background: linear-gradient(180deg, rgba(60,20,20,.3), rgba(60,20,20,.82)); }
+.theme-resto .hero h1 { font-style: italic; font-weight: 500; }
+.theme-resto .card { border-radius: 14px; background: var(--surface); }
+.theme-resto .badge.acc { background: var(--brand); }
+.theme-resto .section h2 { font-size: 32px; }
+.theme-resto .cat-nav { background: color-mix(in srgb, var(--bg) 92%, transparent); }
+.theme-resto .cat-nav a.on { background: var(--brand); }
+.theme-resto .review .avatar { background: var(--brand-2); }
+.theme-resto .footer { background: #3d1616; color: rgba(255,255,255,.7); border-top: none; padding: 40px 0; margin-top: 60px; }
+.theme-resto .footer .pbs { color: #fff; }
+/* menu : lignes à points de conduite */
+.menu-cat { margin-bottom: 34px; }
+.menu-cat h2 { display: flex; align-items: baseline; gap: 12px; }
+.menu-cat h2 small { font-family: var(--font-body); font-size: 13px; color: var(--muted); font-weight: 500; }
+.menu-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px 30px; }
+.menu-item { display: grid; grid-template-columns: 84px 1fr; gap: 14px; align-items: start; text-decoration: none; color: inherit; padding: 8px; border-radius: 14px; transition: background .15s, transform .15s; }
+.menu-item:hover { background: var(--surface); transform: translateX(3px); }
+.menu-item img { width: 84px; height: 84px; object-fit: cover; border-radius: 12px; }
+.menu-item .mi-line { display: flex; align-items: baseline; gap: 8px; }
+.menu-item .mi-name { font-family: var(--font-head); font-size: 17.5px; font-weight: 600; color: var(--ink); }
+.menu-item .mi-dots { flex: 1; border-bottom: 2px dotted var(--line); transform: translateY(-4px); min-width: 20px; }
+.menu-item .mi-price { font-weight: 700; color: var(--brand); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.menu-item .mi-desc { font-size: 13px; color: var(--muted); margin-top: 2px; line-height: 1.45; }
+.menu-item .mi-tags { display: flex; gap: 5px; margin-top: 6px; flex-wrap: wrap; }
+.menu-item .mi-tags span { font-size: 10.5px; padding: 2px 7px; border-radius: 999px; background: #f0e4d2; color: var(--accent-ink); font-weight: 700; }
+.menu-item .mi-add { justify-self: end; margin-top: 6px; }
+/* plan de salle */
+.seatplan { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px; position: relative; }
+.seatplan .sp-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
+.seatplan .tbl { aspect-ratio: 1; border: 2px solid var(--line); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer; font-size: 12px; color: var(--muted); background: #fff; transition: all .15s; position: relative; }
+.seatplan .tbl.round { border-radius: 50%; }
+.seatplan .tbl b { font-size: 15px; color: var(--ink); }
+.seatplan .tbl:hover { border-color: var(--accent); transform: scale(1.04); }
+.seatplan .tbl.busy { background: repeating-linear-gradient(135deg, #fff 0 4px, #f3ebe0 4px 8px); color: #b9aa9a; cursor: not-allowed; }
+.seatplan .tbl.busy b { color: #b9aa9a; }
+.seatplan .tbl.sel { background: var(--brand); border-color: var(--brand); color: #fff; }
+.seatplan .tbl.sel b { color: #fff; }
+.seatplan .tbl .cap { font-size: 11px; }
+.seatplan .zone { grid-column: 1 / -1; font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); font-weight: 700; padding-top: 6px; border-top: 1px dashed var(--line); }
+.seatplan .zone:first-child { border-top: none; padding-top: 0; }
+
+/* ---------------- Accueil & confirmation : neutre Septeo (Space Grotesk) ---------------- */
+.theme-septeo { --brand:#14324f; --accent:#ef6a44; --accent-ink:#b8461f; --font-head:'Space Grotesk', 'Segoe UI', sans-serif; --font-body:'Inter', 'Segoe UI', sans-serif; }

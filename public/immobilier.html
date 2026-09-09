@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Espace locataire — Bellecour Gestion · Loyers, quittances, prélèvement</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="styles.css" /><link rel="stylesheet" href="ui.css" /><link rel="stylesheet" href="skins.css" />
+<link rel="stylesheet" href="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.68.0/adyen.css" />
+<script src="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.68.0/adyen.js"></script>
+<style>
+  .g-hero .inner { padding: 54px 0 46px; }
+  .g-hero h1 { font-size: clamp(28px, 4vw, 42px); max-width: 24ch; }
+  .g-hero .who { display: inline-flex; align-items: center; gap: 10px; background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.25); border-radius: 999px; padding: 6px 14px 6px 6px; font-size: 13.5px; margin-bottom: 14px; }
+  .g-hero .who .av { width: 30px; height: 30px; border-radius: 50%; background: #fff; color: var(--brand); display: grid; place-items: center; font-weight: 800; font-size: 13px; }
+  .due-card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 22px 24px; display: grid; grid-template-columns: 1fr auto; gap: 18px; align-items: center; position: relative; overflow: hidden; }
+  .due-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--accent); }
+  .due-card .d-lab { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 800; }
+  .due-card .d-amt { font-size: 38px; font-weight: 800; color: var(--brand); letter-spacing: -.02em; line-height: 1.1; }
+  .due-card .d-sub { font-size: 13.5px; color: var(--muted); margin-top: 4px; }
+  .due-card .d-actions { display: flex; flex-direction: column; gap: 8px; min-width: 240px; }
+  @media (max-width: 700px) { .due-card { grid-template-columns: 1fr; } }
+  .status-pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; }
+  .status-pill::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .st-paid { background: var(--okbg); color: var(--ok); } .st-due { background: #fff1e0; color: #a35a00; } .st-upcoming { background: #eef2fb; color: #3b5aa8; } .st-late { background: var(--errbg); color: var(--err); }
+  .sched { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+  .sched .m { border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; background: var(--surface); display: flex; flex-direction: column; gap: 6px; }
+  .sched .m b { font-size: 13.5px; }
+  .sched .m .amt { font-size: 16px; font-weight: 800; color: var(--brand); }
+  .sched .m.due { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent); }
+  .mandate-box { border: 1px solid var(--line); border-radius: 18px; background: var(--surface); overflow: hidden; }
+  .mandate-box .mb-head { background: linear-gradient(135deg, #1d3a8a, #2f5fd0); color: #fff; padding: 18px 22px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .mandate-box .mb-head b { font-size: 18px; }
+  .mandate-box .mb-body { padding: 20px 22px; }
+  .mandate-box .sepa-card { background: #f4f6fb; border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; font-family: ui-monospace, Consolas, monospace; font-size: 13px; display: grid; gap: 6px; }
+  .mandate-box .sepa-card span { color: var(--muted); font-family: var(--font-body); font-size: 12px; }
+  .deposit-ring { width: 120px; height: 120px; border-radius: 50%; background: conic-gradient(var(--accent) var(--p, 100%), var(--line) 0); display: grid; place-items: center; position: relative; }
+  .deposit-ring::after { content: ''; position: absolute; inset: 10px; border-radius: 50%; background: var(--surface); }
+  .deposit-ring b { position: relative; z-index: 1; font-size: 14px; font-weight: 800; color: var(--brand); text-align: center; line-height: 1.2; }
+  .list-card .c-photo { aspect-ratio: 16/10; }
+  .ticket { display: flex; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .ticket:last-child { border-bottom: none; }
+  .ticket .t-ico { width: 34px; height: 34px; border-radius: 10px; background: var(--bg); display: grid; place-items: center; }
+  .ticket .t-main { flex: 1; }
+  .ticket .t-main small { display: block; color: var(--muted); font-size: 12px; }
+</style>
+</head>
+<body class="theme-gestion" data-theme-key="gestion">
+  <header class="topbar">
+    <div class="wrap">
+      <a class="brand" href="immobilier.html"><span class="dot">B</span><span>Bellecour Gestion<small>Espace locataire · SPI Gestion Locative by Septeo</small></span></a>
+      <nav class="nav">
+        <a href="#louer">Biens à louer</a>
+        <a class="cta" href="operations.html">Console d'opérations</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero g-hero">
+    <div class="bg" style="background-image:url('img/immo-hero.jpg')"></div>
+    <div class="scrim"></div>
+    <div class="wrap inner">
+      <div class="who"><span class="av">CV</span> Bonjour Charles Vidal · locataire depuis janvier 2025</div>
+      <h1>Votre espace locataire, tout simplement</h1>
+      <p>Loyers, quittances, dépôt de garantie, prélèvement automatique, documents et demandes d’intervention : tout est ici. Les paiements passent par <strong>Payments by Septeo</strong>, intégré à SPI Gestion Locative.</p>
+      <div class="pills"><span class="pill">Quittance instantanée</span><span class="pill">Prélèvement SEPA</span><span class="pill">Dépôt gelé, pas débité</span></div>
+    </div>
+  </section>
+
+  <main class="wrap">
+    <div class="portal" data-tabs-scope>
+      <aside class="portal-side">
+        <div class="portal-me"><span class="avatar">CV</span><div><b>Charles Vidal</b><small id="me-ref"></small></div></div>
+        <nav class="portal-nav" id="pnav">
+          <button data-tab="dash">📊 Tableau de bord</button>
+          <button data-tab="logement">🏠 Mon logement</button>
+          <button data-tab="quittances">🧾 Quittances <span class="n" id="n-quit"></span></button>
+          <button data-tab="echeancier">📅 Échéancier</button>
+          <button data-tab="prelevement">🔁 Prélèvement</button>
+          <button data-tab="depot">🛡️ Dépôt de garantie</button>
+          <button data-tab="documents">📁 Documents <span class="n" id="n-docs"></span></button>
+        </nav>
+        <div class="person" style="align-items:flex-start">
+          <img src="img/gl-gestionnaire.jpg" alt="">
+          <div><div class="p-name">Sophie Marchand</div><div class="p-role">Votre gestionnaire</div><div class="p-contact">04 72 00 00 00<br>Lun–Ven 9h–18h</div></div>
+        </div>
+      </aside>
+
+      <div class="portal-main">
+        <!-- Tableau de bord -->
+        <section data-panel="dash">
+          <h2>Tableau de bord</h2>
+          <p class="lead">Votre situation au <span id="today"></span>.</p>
+          <div class="due-card" data-reveal>
+            <div><div class="d-lab">Loyer à régler · <span id="due-month"></span></div><div class="d-amt" id="due-amt"></div><div class="d-sub">Loyer <b id="due-rent"></b> + provisions sur charges <b id="due-charges"></b> · échéance le 5 du mois</div><div style="margin-top:10px"><span class="status-pill st-due">À payer</span> <span class="hint">Quittance envoyée par e-mail dès le paiement.</span></div></div>
+            <div class="d-actions"><button class="btn accent lg" id="pay-rent">Payer mon loyer</button><button class="btn ghost" data-go="prelevement">Passer au prélèvement automatique</button></div>
+          </div>
+          <div class="kpis" style="margin-top:18px">
+            <div class="kpi" data-reveal><div class="k-lab">Payé cette année</div><div class="k-val" id="k-paid"></div><div class="k-sub"><b>100 %</b> à l’heure ou presque</div></div>
+            <div class="kpi" data-reveal style="--i:1"><div class="k-lab">Dépôt de garantie</div><div class="k-val" id="k-dep"></div><div class="k-sub">Pré-autorisé · non débité</div></div>
+            <div class="kpi" data-reveal style="--i:2"><div class="k-lab">Prochaine échéance</div><div class="k-val" id="k-next"></div><div class="k-sub">le 5 du mois</div></div>
+            <div class="kpi dark" data-reveal style="--i:3"><div class="k-lab">Fin de bail</div><div class="k-val">31 déc. 2027</div><div class="k-sub">Renouvellement tacite</div></div>
+          </div>
+          <div class="grid-2" style="margin-top:18px">
+            <div class="panel-lt" data-reveal><h3>Derniers paiements</h3><div id="last-pay"></div><button class="btn ghost sm" data-go="quittances" style="margin-top:10px">Toutes les quittances</button></div>
+            <div class="panel-lt" data-reveal style="--i:1"><h3>Demandes d’intervention</h3><div id="tickets"></div><button class="btn ghost sm" style="margin-top:10px" onclick="SITE.toast('Demande créée (démo) — votre gestionnaire vous recontacte sous 24 h.','ok')">+ Nouvelle demande</button></div>
+          </div>
+        </section>
+
+        <!-- Mon logement -->
+        <section data-panel="logement" hidden>
+          <h2 id="prop-name"></h2>
+          <p class="lead" id="prop-addr"></p>
+          <div id="prop-gallery"></div>
+          <div class="specs" style="margin-top:18px" id="prop-specs"></div>
+          <div class="grid-2" style="margin-top:18px">
+            <div class="panel-lt"><h3>Le bail</h3><ul class="conf-list" id="lease-list" style="font-size:14px"></ul></div>
+            <div class="panel-lt"><h3>Équipements & annexes</h3><div class="chips" id="prop-extras"></div><h3 style="margin-top:16px">Votre gestionnaire</h3><div class="person"><img src="img/gl-gestionnaire.jpg" alt=""><div><div class="p-name">Sophie Marchand</div><div class="p-role">Gestionnaire de votre bail · Bellecour Gestion</div><div class="p-bio">Répond sous 24 h ouvrées. Interventions urgentes : astreinte 7 j/7.</div></div></div></div>
+          </div>
+        </section>
+
+        <!-- Quittances -->
+        <section data-panel="quittances" hidden>
+          <h2>Quittances & historique</h2>
+          <p class="lead">Chaque paiement génère une quittance dans SPI Gestion Locative. Téléchargez-les ou réglez une échéance en attente.</p>
+          <div class="dtable-wrap"><table class="dtable"><thead><tr><th>Période</th><th>Référence</th><th>Loyer</th><th>Charges</th><th>Total</th><th>Statut</th><th>Moyen</th><th></th></tr></thead><tbody id="quit-rows"></tbody></table></div>
+        </section>
+
+        <!-- Échéancier -->
+        <section data-panel="echeancier" hidden>
+          <h2>Échéancier</h2>
+          <p class="lead">Vos 12 dernières et prochaines échéances. Le loyer est indexé chaque 1er janvier (IRL).</p>
+          <div class="sched" id="sched"></div>
+          <div class="panel-lt" style="margin-top:18px"><h3>Indexation</h3><p class="muted" style="margin:0;font-size:14px">Dernière révision : <b>IRL T3 · +3,26 %</b> au 1er janvier 2026. Prochaine révision au 1er janvier 2027, calculée automatiquement par SPI Gestion Locative et notifiée 30 jours avant.</p></div>
+        </section>
+
+        <!-- Prélèvement -->
+        <section data-panel="prelevement" hidden>
+          <h2>Prélèvement automatique</h2>
+          <p class="lead">Enregistrez une fois votre moyen de paiement : les loyers suivants sont prélevés automatiquement le 5 de chaque mois, avec quittance immédiate.</p>
+          <div class="mandate-box" data-reveal>
+            <div class="mb-head"><div><b>Mandat de prélèvement récurrent</b><div style="font-size:13px;opacity:.85">Bail BAIL-2026-012 · 1 015,00 € / mois · le 5</div></div><span class="badge" style="background:#fff;color:var(--brand)">Non activé</span></div>
+            <div class="mb-body">
+              <div class="grid-2">
+                <div>
+                  <ol class="steps" style="margin-bottom:14px">
+                    <li><div><div class="st-t">Paiement initial de référence</div><div class="st-d">Le loyer du mois est réglé et le moyen de paiement est enregistré (tokenisation).</div></div></li>
+                    <li><div><div class="st-t">Mandat signé électroniquement</div><div class="st-d">Référence unique de mandat (RUM) générée par SPI Gestion Locative.</div></div></li>
+                    <li><div><div class="st-t">Prélèvements suivants</div><div class="st-d">Chaque 5 du mois, sans action de votre part. Notification J-3.</div></div></li>
+                  </ol>
+                  <button class="btn accent lg" id="pay-mandate">Mettre en place le prélèvement</button>
+                  <p class="hint" style="margin-top:8px">Mode <b>mandate</b> : enregistrement du moyen de paiement (SUBSCRIPTION). Les échéances suivantes sont rejouées par la console d’opérations (MIT).</p>
+                </div>
+                <div class="sepa-card">
+                  <span>Créancier</span><div>BELLECOUR GESTION · ICS FR12ZZZ123456</div>
+                  <span>Référence unique de mandat (RUM)</span><div>RUM-BAIL-2026-012-CV</div>
+                  <span>Débiteur</span><div>Charles VIDAL · 10 rue des Lilas, 69006 Lyon</div>
+                  <span>Type</span><div>Récurrent · le 5 de chaque mois</div>
+                  <span>Montant</span><div>1 015,00 EUR (révisable IRL)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Dépôt -->
+        <section data-panel="depot" hidden>
+          <h2>Dépôt de garantie</h2>
+          <p class="lead">Le dépôt est <strong>pré-autorisé</strong> sur votre carte : le montant est gelé, jamais débité tant que l’état des lieux de sortie est conforme.</p>
+          <div class="grid-2">
+            <div class="panel-lt" style="display:flex;gap:20px;align-items:center" data-reveal>
+              <div class="deposit-ring" style="--p:100%"><b id="dep-ring"></b></div>
+              <div><div class="k-lab" style="font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800">Statut</div><div style="font-size:18px;font-weight:800;color:var(--brand)">Pré-autorisé · gelé</div><p class="muted" style="font-size:13.5px;margin:6px 0 0">Équivalent à 1 mois de loyer hors charges. Prolongé automatiquement tous les 30 jours (extension d’autorisation). Libéré sous 1 mois après l’état des lieux de sortie, ou capturé partiellement en cas de retenue justifiée.</p></div>
+            </div>
+            <div class="panel-lt" data-reveal style="--i:1">
+              <h3>Démo : déposer (à nouveau) la garantie</h3>
+              <p class="muted" style="font-size:14px">Simule l’entrée dans les lieux : une pré-autorisation de <b id="dep-amt"></b> est posée sur la carte. Dans la console d’opérations, vous pourrez ensuite la <b>prolonger</b>, l’<b>ajuster</b>, la <b>capturer</b> partiellement ou l’<b>annuler</b>.</p>
+              <button class="btn accent" id="pay-deposit">Verser le dépôt de garantie</button>
+            </div>
+          </div>
+          <ul class="timeline" style="margin-top:18px">
+            <li class="done"><span class="t-dot">✓</span><div><div class="t-title">Entrée dans les lieux</div><div class="t-desc">Pré-autorisation posée · état des lieux d’entrée signé</div></div><span class="t-date">01/01/2025</span></li>
+            <li class="done"><span class="t-dot">✓</span><div><div class="t-title">Extensions mensuelles</div><div class="t-desc">Autorisation prolongée automatiquement (20 extensions)</div></div><span class="t-date">chaque mois</span></li>
+            <li class="now"><span class="t-dot">●</span><div><div class="t-title">Bail en cours</div><div class="t-desc">Montant gelé, aucun débit</div></div><span class="t-date">aujourd’hui</span></li>
+            <li><span class="t-dot">4</span><div><div class="t-title">État des lieux de sortie</div><div class="t-desc">Libération totale, ou capture partielle justifiée (devis à l’appui)</div></div><span class="t-date">fin de bail</span></li>
+          </ul>
+        </section>
+
+        <!-- Documents -->
+        <section data-panel="documents" hidden>
+          <h2>Documents</h2>
+          <p class="lead">Tous vos documents de bail, classés et téléchargeables.</p>
+          <div class="docs" id="docs"></div>
+        </section>
+      </div>
+    </div>
+
+    <section class="section" id="louer">
+      <div class="sec-head"><div><span class="eyebrow">Bellecour Gestion · Location</span><h2>Nos biens à louer en ce moment</h2><p class="lead">Réservez un bien : le dépôt de garantie est pré-autorisé à la réservation, puis capturé (ou libéré) à la signature du bail.</p></div></div>
+      <div class="cards" id="listings"></div>
+    </section>
+
+    <section class="section">
+      <div class="dt-band" data-reveal>
+        <div>
+          <span class="eyebrow" style="color:#bcd0ff">Data travel</span>
+          <h2>Un paiement = un locataire identifié</h2>
+          <p>Référence de bail, période, qualité (locataire, colocataire, garant), jour de prélèvement, IBAN : chaque encaissement porte son contexte. SPI Gestion Locative rapproche automatiquement, génère la quittance et mesure : taux d’impayés par typologie, délai moyen de règlement, adoption du prélèvement.</p>
+          <div data-pbs></div>
+        </div>
+        <div class="dt-json" id="dt-json"></div>
+      </div>
+    </section>
+
+    <section class="section"><p class="note">Démo sandbox — carte de test <strong>4111 1111 1111 1111</strong> · 03/30 · 737. Après paiement : capture / extension / ajustement du dépôt, rejeu du prélèvement (MIT) et gestion des moyens enregistrés dans la <a href="operations.html">console d'opérations</a>.</p></section>
+  </main>
+
+  <footer class="footer"><div class="wrap"><span>Bellecour Gestion · 18 place Bellecour, Lyon · démo sandbox</span><span>SPI Gestion Locative — Septeo Real Estate</span></div></footer>
+
+  <script src="themes.js"></script>
+  <script src="theme-switcher.js"></script>
+  <script src="common.js"></script>
+  <script src="checkout.js"></script>
+  <script src="site.js"></script>
+  <script src="data/gestion.js"></script>
+  <script>
+    (function () {
+      var D = window.DATA_GL, S = window.SITE, L = D.lease;
+      var due = D.schedule.filter(function (s) { return s.status === 'due'; })[0];
+      var paid = D.schedule.filter(function (s) { return s.status === 'paid' || s.status === 'late-paid'; });
+      var STATUS = { paid: ['Payée', 'st-paid'], 'late-paid': ['Payée (retard)', 'st-late'], due: ['À payer', 'st-due'], upcoming: ['À venir', 'st-upcoming'] };
+      document.getElementById('me-ref').textContent = D.tenant.ref + ' · ' + L.ref;
+      document.getElementById('today').textContent = S.fmtDate(S.today(0), true);
+      document.getElementById('due-month').textContent = due.label; document.getElementById('due-amt').textContent = S.euros(due.total);
+      document.getElementById('due-rent').textContent = S.euros(L.rent); document.getElementById('due-charges').textContent = S.euros(L.charges);
+      var paidYear = paid.filter(function (s) { return s.ym.slice(0, 4) === String(new Date().getFullYear()); }).reduce(function (t, s) { return t + s.total; }, 0);
+      document.getElementById('k-paid').textContent = S.euros(paidYear);
+      document.getElementById('k-dep').textContent = S.euros(L.deposit);
+      document.getElementById('k-next').textContent = '5 ' + D.schedule.filter(function (s) { return s.status === 'upcoming'; })[0].label.split(' ')[0].toLowerCase();
+      document.getElementById('dep-ring').innerHTML = S.euros(L.deposit) + '<br><span style="font-size:10px;color:var(--muted)">gelés</span>';
+      document.getElementById('dep-amt').textContent = S.euros(L.deposit);
+      document.getElementById('n-quit').textContent = paid.length; document.getElementById('n-docs').textContent = D.documents.length;
+
+      document.getElementById('last-pay').innerHTML = paid.slice(-3).reverse().map(function (s) { return '<div class="ticket"><span class="t-ico">🧾</span><div class="t-main">' + s.label + '<small>' + s.method + ' · réglé le ' + S.fmtDate(s.paidAt) + '</small></div><b class="tnum">' + S.euros(s.total) + '</b></div>'; }).join('');
+      document.getElementById('tickets').innerHTML = D.tickets.map(function (t) { return '<div class="ticket"><span class="t-ico">🔧</span><div class="t-main">' + S.esc(t.title) + '<small>' + S.esc(t.by) + ' · ' + t.date + '</small></div><span class="status-pill ' + (t.status === 'Résolu' ? 'st-paid' : 'st-due') + '">' + t.status + '</span></div>'; }).join('');
+
+      // logement
+      var Pp = D.property;
+      document.getElementById('prop-name').textContent = Pp.name; document.getElementById('prop-addr').textContent = Pp.address + ' · ' + Pp.floor;
+      S.gallery('#prop-gallery', Pp.photos.map(function (p) { return { src: p[0], alt: p[1] }; }));
+      document.getElementById('prop-specs').innerHTML = [['📐', 'Surface', Pp.size + ' m²'], ['🚪', 'Pièces', Pp.rooms + ' (' + Pp.bedrooms + ' ch.)'], ['⚡', 'DPE', Pp.dpe], ['🏗️', 'Construction', Pp.built], ['🔥', 'Chauffage', Pp.heating], ['🚗', 'Stationnement', Pp.parking]].map(function (s) { return '<div class="spec"><span class="s-ico">' + s[0] + '</span><div><div class="s-lab">' + s[1] + '</div><div class="s-val">' + s[2] + '</div></div></div>'; }).join('');
+      document.getElementById('prop-extras').innerHTML = Pp.extras.map(function (e) { return '<span class="chip-t">' + S.esc(e) + '</span>'; }).join('');
+      document.getElementById('lease-list').innerHTML = [['Référence', L.ref], ['Type', L.type], ['Début', S.fmtDate(L.start, true)], ['Fin', S.fmtDate(L.end, true)], ['Loyer hors charges', S.euros(L.rent)], ['Provisions sur charges', S.euros(L.charges)], ['Dépôt de garantie', S.euros(L.deposit) + ' · ' + L.depositStatus], ['Indexation', L.indexation], ['Assurance', L.insurance]].map(function (r) { return '<li><span>' + r[0] + '</span><span>' + r[1] + '</span></li>'; }).join('');
+
+      // quittances
+      document.getElementById('quit-rows').innerHTML = D.schedule.slice().reverse().map(function (s) {
+        var st = STATUS[s.status];
+        return '<tr class="' + (s.status === 'due' ? 'hl' : '') + '"><td><b>' + s.label + '</b></td><td class="muted">' + s.ref + '</td><td class="num">' + S.euros(s.rent) + '</td><td class="num">' + S.euros(s.charges) + '</td><td class="num">' + S.euros(s.total) + '</td><td><span class="status-pill ' + st[1] + '">' + st[0] + '</span></td><td class="muted">' + (s.method || '—') + '</td>' +
+          '<td>' + (s.status === 'due' ? '<button class="btn sm accent" data-checkout data-mode="immediate" data-amount="' + s.total + '" data-label="Loyer ' + s.label + ' — T3 Lilas" data-summary=\'' + JSON.stringify([['Bail', L.ref], ['Loyer', S.euros(s.rent)], ['Charges', S.euros(s.charges)], ['Quittance', 'envoyée par e-mail']]) + '\' data-prefill=\'' + JSON.stringify({ period: s.ym, leaseRef: L.ref }) + '\'>Payer</button>' : s.status === 'upcoming' ? '<span class="hint">—</span>' : '<button class="dl" onclick="SITE.toast(\'Quittance ' + s.ref + ' téléchargée (démo)\',\'ok\')">⬇ PDF</button>') + '</td></tr>';
+      }).join('');
+
+      // échéancier
+      document.getElementById('sched').innerHTML = D.schedule.map(function (s) { var st = STATUS[s.status]; return '<div class="m ' + (s.status === 'due' ? 'due' : '') + '"><b>' + s.label + '</b><span class="amt">' + S.euros(s.total) + '</span><span class="status-pill ' + st[1] + '">' + st[0] + '</span></div>'; }).join('');
+
+      // documents
+      document.getElementById('docs').innerHTML = D.documents.map(function (d) { return '<div class="doc"><span class="d-ico">' + d.type + '</span><div class="d-main"><div class="d-name">' + S.esc(d.name) + '</div><div class="d-meta">' + S.esc(d.meta) + '</div></div><button class="dl" onclick="SITE.toast(\'' + S.esc(d.name).replace(/'/g, '’') + ' — téléchargement (démo)\',\'ok\')">⬇ Télécharger</button></div>'; }).join('');
+
+      // biens à louer
+      document.getElementById('listings').innerHTML = D.listings.map(function (l, i) {
+        return '<div class="card list-card" data-reveal style="--i:' + i + '"><div class="c-photo"><img src="' + l.img + '" alt="" loading="lazy"><div class="badges"><span class="badge acc">DPE ' + l.dpe + '</span><span class="badge">' + S.esc(l.avail) + '</span></div></div>' +
+          '<div class="c-body"><h3>' + S.esc(l.name) + '</h3><div class="c-meta">' + S.esc(l.meta) + '</div><div class="chips">' + l.tags.map(function (t) { return '<span class="chip-t">' + t + '</span>'; }).join('') + '</div>' +
+          '<div class="c-foot"><div class="c-price">' + S.euros(l.rent) + '<small>+ ' + S.euros(l.charges) + ' charges / mois</small></div><div class="c-price" style="text-align:right;font-size:15px">' + S.euros(l.deposit) + '<small>dépôt de garantie</small></div></div>' +
+          '<div class="c-actions"><button class="btn accent" data-checkout data-mode="caution" data-amount="' + l.deposit + '" data-label="Dépôt de garantie — ' + S.esc(l.name) + '" data-summary=\'' + JSON.stringify([['Bien', l.name], ['Loyer', S.euros(l.rent) + ' + ' + S.euros(l.charges) + ' ch.'], ['Dépôt', S.euros(l.deposit) + ' (pré-autorisé)'], ['Capture', 'à la signature du bail']]) + '\' data-prefill=\'' + JSON.stringify({ property: l.name, leaseRef: 'CANDIDATURE-' + l.id.toUpperCase() }) + '\'>Réserver (dépôt gelé)</button></div></div></div>';
+      }).join('');
+
+      // paiements principaux
+      var basePre = { leaseRef: L.ref, property: Pp.name, period: due.ym };
+      document.getElementById('pay-rent').onclick = function () { PMS.checkout({ mode: 'immediate', amount: due.total, itemLabel: 'Loyer ' + due.label + ' — T3 Lilas', summary: [['Bail', L.ref], ['Loyer hors charges', S.euros(L.rent)], ['Provisions sur charges', S.euros(L.charges)], ['Quittance', 'générée et envoyée par e-mail']], prefill: basePre }); };
+      document.getElementById('pay-mandate').onclick = function () { PMS.checkout({ mode: 'mandate', amount: due.total, itemLabel: 'Mise en place du prélèvement — ' + L.ref, summary: [['Mandat', 'RUM-BAIL-2026-012-CV'], ['Échéance', 'le 5 de chaque mois'], ['Montant', S.euros(due.total) + ' / mois'], ['1er prélèvement', due.label]], prefill: Object.assign({ paymentDay: 'Le 5 du mois' }, basePre) }); };
+      document.getElementById('pay-deposit').onclick = function () { PMS.checkout({ mode: 'caution', amount: L.deposit, itemLabel: 'Dépôt de garantie — ' + L.ref, summary: [['Bail', L.ref], ['Montant gelé', S.euros(L.deposit)], ['Débit', 'aucun (pré-autorisation)'], ['Libération', 'sous 1 mois après état des lieux de sortie']], prefill: basePre }); };
+
+      // onglets
+      var go = S.tabs('#pnav');
+      document.querySelectorAll('[data-go]').forEach(function (b) { b.onclick = function () { go(b.getAttribute('data-go')); window.scrollTo({ top: document.querySelector('.portal').offsetTop - 80, behavior: 'smooth' }); }; });
+
+      var j = { shopper: { firstName: 'Charles', lastName: 'Vidal', email: 'charles.vidal@example.fr', billingAddress: { street: '10 rue des Lilas', postalCode: '69006', city: 'Lyon', country: 'FR' } }, metadata: { vertical: 'gestion', leaseRef: L.ref, property: 'T3 — 12 rue des Lilas', period: due.ym, tenantType: 'Locataire', paymentDay: 'Le 5 du mois', iban: 'FR76 3000 6000 **** **** **** 189', mode: 'mandate' } };
+      document.getElementById('dt-json').innerHTML = JSON.stringify(j, null, 2).replace(/"([^"]+)":/g, '<span class="k">"$1"</span>:').replace(/: "([^"]*)"/g, ': <span class="s">"$1"</span>').replace(/: (\d+)/g, ': <span class="n">$1</span>');
+      S.reveal();
+    })();
+  </script>
+</body>
+</html>

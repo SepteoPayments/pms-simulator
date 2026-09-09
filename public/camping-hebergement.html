@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hébergement — Camping Les Flots Bleus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="styles.css" /><link rel="stylesheet" href="ui.css" /><link rel="stylesheet" href="skins.css" />
+<link rel="stylesheet" href="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.68.0/adyen.css" />
+<script src="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.68.0/adyen.js"></script>
+<style>
+  .zone-band { display: flex; gap: 14px; align-items: center; background: linear-gradient(90deg, #2c5a3a, #3f8f5a); color: #fff; border-radius: 20px; padding: 16px 20px; }
+  .zone-band .zb-ico { font-size: 30px; }
+  .zone-band b { font-family: var(--font-head); font-size: 19px; display: block; }
+  .zone-band span { font-size: 13px; opacity: .9; }
+  .mini-plan { background: linear-gradient(180deg, #eef5e6, #e3eedb); border: 2px solid var(--line); border-radius: 20px; padding: 10px; }
+  .mini-plan svg { width: 100%; height: auto; display: block; }
+  .pax-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 8px 0; }
+  .pax-row .pax { display: flex; align-items: center; justify-content: space-between; border: 2px solid var(--line); border-radius: 14px; padding: 6px 8px 6px 12px; font-size: 13px; font-weight: 700; }
+  .pax-row .pax .stepper { border-radius: 10px; }
+  .pax-row .pax .stepper button { width: 28px; height: 30px; }
+  .pax-row .pax .stepper span { min-width: 28px; }
+  .act-mini { display: grid; gap: 8px; }
+  .act-mini label { display: flex; align-items: center; gap: 10px; border: 2px solid var(--line); border-radius: 14px; padding: 8px 10px; cursor: pointer; font-size: 13.5px; }
+  .act-mini label.on { border-color: var(--accent); background: #fff4e8; }
+  .act-mini label img { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; }
+  .act-mini label b { display: block; font-size: 13.5px; }
+  .act-mini label small { color: var(--muted); font-size: 12px; }
+  .act-mini label .pr { margin-left: auto; font-weight: 800; color: var(--brand); white-space: nowrap; }
+  .act-mini label input { accent-color: var(--accent); width: 18px; height: 18px; }
+</style>
+</head>
+<body class="theme-camping" data-theme-key="camping">
+  <header class="topbar">
+    <div class="wrap">
+      <a class="brand" href="camping.html"><span class="dot">⛺</span><span>Les Flots Bleus<small>Mimizan · ★★★★ · eSeason by Septeo</small></span></a>
+      <nav class="nav">
+        <a href="camping.html#hebergements">Hébergements</a>
+        <a href="camping.html#plan">Plan</a>
+        <a href="camping.html#activites">Activités</a>
+        <button class="cartbtn" id="open-cart">🎟️ Activités <span class="count" id="cart-count">0</span></button>
+        <a class="cta" href="operations.html">Console</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap" id="root"></main>
+
+  <footer class="footer"><div class="wrap"><span>Camping Les Flots Bleus · Mimizan-Plage · démo sandbox</span><span>eSeason · Resalys — Septeo Hospitality</span></div></footer>
+
+  <script src="themes.js"></script>
+  <script src="theme-switcher.js"></script>
+  <script src="common.js"></script>
+  <script src="checkout.js"></script>
+  <script src="site.js"></script>
+  <script src="data/camping.js"></script>
+  <script>
+    (function () {
+      var D = window.DATA_CAMP, S = window.SITE, root = document.getElementById('root');
+      var id = S.qs('id') || 'mobil';
+      var H = D.stays.filter(function (s) { return s.id === id; })[0];
+      if (!H) { root.innerHTML = '<div class="empty-state" style="margin:60px 0"><div class="e-ico">⛺</div><h2>Hébergement introuvable</h2><p><a href="camping.html#hebergements">Retour aux hébergements</a></p></div>'; return; }
+      document.title = H.name + ' — Camping Les Flots Bleus';
+      var d0 = new Date(); var toSat = (6 - d0.getDay() + 7) % 7 || 7;
+      var st = { in: S.qs('in') || S.today(toSat + 21), nights: Number(S.qs('nights')) || 7, adults: Number(S.qs('adults')) || 2, kids: Number(S.qs('kids')) || 2, opts: {}, acts: {}, pitch: S.qs('pitch') || '' };
+      function isHigh(iso) { var m = Number(iso.slice(5, 7)); return m === 7 || m === 8; }
+      function nightPrice(iso) { return H.night + (isHigh(iso) ? H.highPlus : 0); }
+      var booked = []; var seed = H.id.length * 29; for (var k = 1; k < 200; k++) { if (S.rand(seed + k) < 0.1) { booked.push(S.today(k)); booked.push(S.today(k + 1)); } }
+      var bset = {}; booked.forEach(function (b) { bset[b] = 1; });
+      for (var c = 0; c < st.nights; c++) if (bset[S.addDays(st.in, c)]) { st.in = S.addDays(st.in, st.nights + 2); c = -1; if (st.in > S.today(200)) break; }
+      var photos = H.photos.map(function (p) { return { src: p[0], alt: p[1] }; });
+      var zone = D.zones.filter(function (z) { return H.zone.toLowerCase().indexOf(z.name.toLowerCase().replace('zone ', '')) > -1; })[0] || D.zones[0];
+      var suggested = D.activities.filter(function (a) { return a.price > 0; }).slice(0, 5);
+
+      root.innerHTML =
+        '<nav class="crumbs"><a href="index.html">Univers</a><span class="sep">›</span><a href="camping.html">Les Flots Bleus</a><span class="sep">›</span><a href="camping.html#hebergements">Hébergements</a><span class="sep">›</span><b>' + S.esc(H.name) + '</b></nav>' +
+        '<div class="fiche-head"><div><span class="eyebrow">' + S.esc(H.type) + ' · ' + S.esc(H.badge) + '</span><h1>' + S.esc(H.name) + '</h1>' +
+          '<div class="sub">' + S.stars(H.rating, H.reviewsCount) + '<span class="dot-sep">📍 ' + S.esc(H.zone) + '</span><span class="dot-sep">👥 jusqu’à ' + H.capacity + ' pers.</span></div></div>' +
+          '<div class="aside"><div class="from">à partir de</div><div class="price-big">' + S.euros(H.night) + ' <small>/ nuit</small></div></div></div>' +
+        '<div class="fiche-grid">' +
+          '<div class="fiche-main">' +
+            '<div id="gallery"></div>' +
+            '<div class="zone-band" data-reveal><span class="zb-ico">🌲</span><div><b>' + S.esc(H.zone) + '</b><span>Emplacement ' + S.esc(H.pitchSize) + (st.pitch ? ' · n° ' + S.esc(st.pitch) + ' choisi sur le plan' : '') + '</span></div></div>' +
+            '<section data-reveal><h2>' + S.esc(H.tagline) + '</h2><div class="prose"><p>' + S.esc(H.desc) + '</p></div></section>' +
+            '<section data-reveal><h2>En un coup d’œil</h2><div class="specs">' +
+              '<div class="spec"><span class="s-ico">👥</span><div><div class="s-lab">Capacité</div><div class="s-val">' + H.capacity + ' personnes</div></div></div>' +
+              (H.bedrooms ? '<div class="spec"><span class="s-ico">🛏️</span><div><div class="s-lab">Chambres</div><div class="s-val">' + H.bedrooms + '</div></div></div>' : '') +
+              '<div class="spec"><span class="s-ico">📐</span><div><div class="s-lab">Surface</div><div class="s-val">' + H.size + ' m²</div></div></div>' +
+              (H.terrace ? '<div class="spec"><span class="s-ico">🪵</span><div><div class="s-lab">Terrasse</div><div class="s-val">' + H.terrace + ' m²</div></div></div>' : '') +
+              '<div class="spec"><span class="s-ico">🕒</span><div><div class="s-lab">Arrivée / départ</div><div class="s-val">16h / 10h</div></div></div>' +
+              '<div class="spec"><span class="s-ico">🏖️</span><div><div class="s-lab">Plage</div><div class="s-val">300 m à pied</div></div></div>' +
+            '</div></section>' +
+            '<section data-reveal><h2>Équipements</h2><ul class="amen">' + H.amenities.map(function (a) { var l = D.amenityLabels[a]; return '<li><span class="a-ico">' + l[0] + '</span>' + S.esc(l[1]) + '</li>'; }).join('') + '</ul></section>' +
+            '<section data-reveal><h2>Les petits plus</h2><ul class="perks">' + H.perks.map(function (p) { return '<li>' + S.esc(p) + '</li>'; }).join('') + '</ul></section>' +
+            '<section data-reveal><h2>Où êtes-vous dans le camping ?</h2><div class="mini-plan" id="mini-plan"></div><p class="hint" style="margin-top:8px">Zone en surbrillance. <a href="camping.html#plan">Choisir un emplacement précis sur le grand plan →</a></p></section>' +
+            '<section data-reveal><h2>Disponibilités</h2><p class="hint" style="margin:0 0 10px">Juillet & août : +' + S.euros(H.highPlus) + ' / nuit. Arrivées possibles tous les jours.</p><div id="cal"></div></section>' +
+            '<section data-reveal><h2>Options</h2><div class="options" id="opts"></div></section>' +
+            '<section data-reveal><h2>Avis des campeurs</h2><div class="reviews">' + H.reviews.map(function (r) { return '<div class="review"><div class="r-head"><span class="avatar">' + S.esc(r.who[0]) + '</span><div><div class="r-who">' + S.esc(r.who) + '</div><div class="r-meta">' + S.esc(r.from) + ' · ' + S.esc(r.date) + '</div></div><span style="margin-left:auto">' + S.stars(r.rating) + '</span></div><p class="r-txt">' + S.esc(r.text) + '</p></div>'; }).join('') + '</div></section>' +
+            '<section data-reveal><h2>Nos autres hébergements</h2><div class="cards">' + D.stays.filter(function (s) { return s.id !== H.id; }).map(function (s) { return '<a class="card" href="camping-hebergement.html?id=' + s.id + '&in=' + st.in + '&nights=' + st.nights + '&adults=' + st.adults + '&kids=' + st.kids + '"><div class="c-photo"><img src="' + s.photos[0][0] + '" alt="" loading="lazy"><div class="badges"><span class="badge acc">' + S.esc(s.badge) + '</span></div></div><div class="c-body"><h3>' + S.esc(s.name) + '</h3><div class="c-foot"><div class="c-price">' + S.euros(s.night) + '<small>/ nuit</small></div><span class="c-go">Voir</span></div></div></a>'; }).join('') + '</div></section>' +
+          '</div>' +
+          '<aside class="book-card" id="book"></aside>' +
+        '</div>';
+
+      S.gallery('#gallery', photos);
+      // mini plan
+      (function () {
+        var svg = '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">';
+        D.zones.forEach(function (z) { var on = z.id === zone.id; svg += '<rect x="' + z.x + '" y="' + z.y + '" width="' + z.w + '" height="' + z.h + '" rx="6" fill="' + z.color + '" opacity="' + (on ? '.95' : '.35') + '"' + (on ? ' stroke="#f08a2e" stroke-width="1.5"' : '') + '/><text x="' + (z.x + 3) + '" y="' + (z.y + 7) + '" style="font-size:4.5px;font-weight:700;fill:#2c5a3a;font-family:Fredoka,sans-serif">' + z.name + (on ? ' ← vous' : '') + '</text>'; });
+        D.pois.forEach(function (p) { svg += '<text x="' + p[2] + '" y="' + p[3] + '" text-anchor="middle" style="font-size:5px">' + p[0] + '</text>'; });
+        svg += '</svg>';
+        document.getElementById('mini-plan').innerHTML = svg;
+      })();
+      var cal = S.calendar('#cal', { months: 2, booked: booked, start: st.in, end: S.addDays(st.in, st.nights), minNights: 2, prices: nightPrice, onChange: function (a, b, n) { st.in = a; if (n) st.nights = n; renderBook(); } });
+      document.getElementById('opts').innerHTML = D.options.filter(function (o) { return !(o.id === 'bain' && H.id !== 'cottage') && !(o.id === 'frigo' && H.id !== 'emplacement'); }).map(function (o) { return '<label class="option" data-o="' + o.id + '"><input type="checkbox"><span class="o-ico">' + o.ico + '</span><div class="o-main"><div class="o-name">' + S.esc(o.name) + '</div><div class="o-desc">' + S.esc(o.desc) + '</div></div><div class="o-price">' + S.euros(o.price) + ' <small>/ ' + S.esc(o.per) + '</small></div></label>'; }).join('');
+      document.querySelectorAll('.option input').forEach(function (cb) { cb.addEventListener('change', function () { var oid = cb.closest('.option').getAttribute('data-o'); st.opts[oid] = cb.checked; cb.closest('.option').classList.toggle('on', cb.checked); renderBook(); }); });
+
+      function breakdown() {
+        var n = st.nights, stay = 0, lines = [], pax = st.adults + st.kids;
+        for (var i = 0; i < n; i++) stay += nightPrice(S.addDays(st.in, i));
+        lines.push([H.type + ' · ' + n + ' nuits', stay]);
+        lines.push(['Taxe de séjour · ' + st.adults + ' ad.', D.taxeSejour * st.adults * n]);
+        D.options.forEach(function (o) { if (st.opts[o.id]) lines.push([o.name, o.per === 'nuit' ? o.price * n : o.price]); });
+        var actsTotal = 0; suggested.forEach(function (a) { if (st.acts[a.id]) { var amt = a.per === 'pers.' ? a.price * pax : a.per === 'jour' ? a.price * Math.min(n, 3) : a.per === 'pers./jour' ? a.price * pax * n : a.price; lines.push([a.name, amt]); actsTotal += amt; } });
+        var total = lines.reduce(function (s, l) { return s + l[1]; }, 0);
+        var dep = Math.round(total * D.depositRate / 100) * 100;
+        return { n: n, lines: lines, total: total, deposit: dep, balance: total - dep, pax: pax };
+      }
+      function renderBook() {
+        var b = breakdown(), box = document.getElementById('book'), tooMany = b.pax > H.capacity;
+        box.innerHTML =
+          '<div class="bc-price"><b>' + S.euros(H.night) + '</b><span>/ nuit · basse saison</span></div>' +
+          '<div class="bc-rating">' + S.stars(H.rating) + '<span>' + H.rating.toFixed(1) + ' · ' + H.reviewsCount + ' avis</span></div>' +
+          '<div class="field-row"><label>Arrivée<input type="date" id="b-in" value="' + st.in + '"></label><label>Nuits<select id="b-n">' + [2, 3, 4, 5, 6, 7, 10, 14].map(function (x) { return '<option ' + (x === st.nights ? 'selected' : '') + '>' + x + '</option>'; }).join('') + '</select></label></div>' +
+          '<div class="pax-row"><div class="pax">Adultes <div class="stepper"><button type="button" data-k="adults" data-d="-1">−</button><span>' + st.adults + '</span><button type="button" data-k="adults" data-d="1">+</button></div></div><div class="pax">Enfants <div class="stepper"><button type="button" data-k="kids" data-d="-1">−</button><span>' + st.kids + '</span><button type="button" data-k="kids" data-d="1">+</button></div></div></div>' +
+          (tooMany ? '<div class="co-err">Capacité maximale : ' + H.capacity + ' personnes.</div>' : '') +
+          '<div class="hint" style="margin:10px 0 6px">🎟️ Ajouter des activités au séjour</div><div class="act-mini">' + suggested.map(function (a) { return '<label class="' + (st.acts[a.id] ? 'on' : '') + '"><input type="checkbox" data-a="' + a.id + '" ' + (st.acts[a.id] ? 'checked' : '') + '><img src="' + a.img + '" alt=""><div><b>' + a.ico + ' ' + S.esc(a.name) + '</b><small>' + S.euros(a.price) + ' / ' + S.esc(a.per) + '</small></div></label>'; }).join('') + '</div>' +
+          b.lines.map(function (l) { return '<div class="bc-row"><span class="lab">' + S.esc(l[0]) + '</span><span class="val">' + S.euros(l[1]) + '</span></div>'; }).join('') +
+          '<div class="bc-total"><span>Total séjour<small>30 % maintenant · 70 % à J-30</small></span><span>' + S.euros(b.total) + '</span></div>' +
+          '<div class="actions">' +
+            '<button class="btn accent" id="go-dep" ' + (tooMany ? 'disabled' : '') + '>Réserver — acompte ' + S.euros(b.deposit) + '</button>' +
+            '<button class="btn outline" id="go-bal" ' + (tooMany ? 'disabled' : '') + '>Régler le solde — ' + S.euros(b.balance) + '</button>' +
+          '</div>' +
+          '<div class="how"><b>Acompte de 30 %</b> encaissé aujourd’hui (capture immédiate). <b>Solde</b> le ' + S.fmtDate(S.addDays(st.in, -30)) + ' via le lien envoyé par eSeason. Les activités cochées sont incluses dans le séjour ; vous pourrez en ajouter sur place.</div>' +
+          '<div class="pbs-slot" data-pbs="compact"></div>';
+        S.brand();
+        document.getElementById('b-in').onchange = function () { st.in = this.value; cal.set(st.in, S.addDays(st.in, st.nights)); renderBook(); };
+        document.getElementById('b-n').onchange = function () { st.nights = Number(this.value); cal.set(st.in, S.addDays(st.in, st.nights)); renderBook(); };
+        box.querySelectorAll('.stepper button').forEach(function (bt) { bt.onclick = function () { var k = bt.getAttribute('data-k'); st[k] = Math.max(k === 'adults' ? 1 : 0, st[k] + Number(bt.getAttribute('data-d'))); renderBook(); }; });
+        box.querySelectorAll('.act-mini input').forEach(function (cb) { cb.onchange = function () { st.acts[cb.getAttribute('data-a')] = cb.checked; renderBook(); }; });
+        var base = [['Hébergement', H.name + (st.pitch ? ' · n° ' + st.pitch : '')], ['Séjour', S.fmtDate(st.in) + ' · ' + b.n + ' nuits'], ['Occupants', st.adults + ' adulte(s), ' + st.kids + ' enfant(s)']];
+        var pre = { stay: H.name + (st.pitch ? ' n° ' + st.pitch : ''), checkIn: st.in, nights: String(b.n), adults: String(st.adults), children: String(st.kids) };
+        document.getElementById('go-dep').onclick = function () { PMS.checkout({ mode: 'immediate', amount: b.deposit, itemLabel: 'Acompte 30 % — ' + H.name, summary: base.concat(b.lines.map(function (l) { return [l[0], S.euros(l[1])]; }), [['Total séjour', S.euros(b.total)], ['Acompte réglé maintenant', S.euros(b.deposit)], ['Solde à J-30', S.euros(b.balance)]]), prefill: pre }); };
+        document.getElementById('go-bal').onclick = function () { PMS.checkout({ mode: 'immediate', amount: b.balance, itemLabel: 'Solde du séjour — ' + H.name, summary: base.concat([['Total séjour', S.euros(b.total)], ['Acompte déjà réglé', S.euros(b.deposit)], ['Solde', S.euros(b.balance)]]), prefill: pre }); };
+      }
+      renderBook();
+      S.reveal();
+    })();
+  </script>
+</body>
+</html>

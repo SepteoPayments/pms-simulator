@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Extranet copropriétaires — Résidence Le Parc · Cabinet Vernet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="styles.css" /><link rel="stylesheet" href="ui.css" /><link rel="stylesheet" href="skins.css" />
+<link rel="stylesheet" href="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.68.0/adyen.css" />
+<script src="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.68.0/adyen.js"></script>
+<style>
+  .y-hero .inner { padding: 54px 0 46px; }
+  .y-hero h1 { font-size: clamp(28px, 4vw, 42px); }
+  .y-hero .lot { display: inline-flex; gap: 10px; align-items: center; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.25); border-radius: 4px; padding: 6px 12px; font-size: 13px; margin-bottom: 14px; }
+  .call-card { background: var(--surface); border: 1px solid var(--line); border-left: 5px solid var(--accent); border-radius: 8px; padding: 22px 24px; display: grid; grid-template-columns: 1fr auto; gap: 18px; align-items: center; }
+  .call-card .c-lab { font-size: 12px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); font-weight: 700; }
+  .call-card .c-amt { font-family: var(--font-head); font-size: 36px; color: var(--brand); line-height: 1.1; margin: 4px 0; }
+  .call-card .c-sub { font-size: 13.5px; color: var(--muted); }
+  .call-card .c-actions { display: flex; flex-direction: column; gap: 8px; min-width: 250px; }
+  @media (max-width: 700px) { .call-card { grid-template-columns: 1fr; } }
+  .status-pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 3px; }
+  .status-pill::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .st-paid { background: var(--okbg); color: var(--ok); } .st-due { background: #fbeee2; color: #8a4c12; } .st-upcoming { background: #eceff5; color: #51617f; }
+  .budget-bars { display: grid; gap: 8px; }
+  .budget-bars div { display: grid; grid-template-columns: 1fr 120px; gap: 10px; align-items: center; font-size: 13.5px; }
+  .budget-bars div small { display: block; color: var(--muted); font-size: 12px; }
+  .budget-bars i { display: block; height: 10px; background: var(--line); border-radius: 2px; overflow: hidden; }
+  .budget-bars i::after { content: ''; display: block; height: 100%; width: var(--w); background: var(--brand-2); }
+  .budget-bars b { text-align: right; font-variant-numeric: tabular-nums; }
+  .share-box { background: var(--brand); color: #fff; border-radius: 8px; padding: 20px 22px; }
+  .share-box .big { font-family: var(--font-head); font-size: 34px; }
+  .share-box small { display: block; opacity: .75; font-size: 12.5px; }
+  .work { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; display: grid; grid-template-columns: 220px 1fr; }
+  .work img { width: 100%; height: 100%; object-fit: cover; min-height: 200px; }
+  .work .w-b { padding: 18px 20px; }
+  .work .w-b h3 { margin: 0 0 4px; font-size: 20px; }
+  .work .w-calls { display: grid; gap: 6px; margin-top: 12px; }
+  .work .w-calls div { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; font-size: 13.5px; padding: 8px 10px; background: var(--bg); border-radius: 4px; }
+  .work .w-calls div b { font-variant-numeric: tabular-nums; }
+  @media (max-width: 700px) { .work { grid-template-columns: 1fr; } }
+  .ag { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); padding: 16px 18px; }
+  .ag .ag-h { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+  .ag .ag-h b { font-family: var(--font-head); font-size: 17px; }
+  .ag ul { margin: 10px 0 0; padding-left: 18px; font-size: 14px; color: var(--ink); }
+  .ag ul li { margin: 3px 0; }
+  .mandate-strip { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; background: linear-gradient(135deg, #2c3a52, #51617f); color: #fff; border-radius: 8px; padding: 18px 22px; }
+  .mandate-strip b { font-family: var(--font-head); font-size: 18px; display: block; }
+  .mandate-strip span { font-size: 13.5px; opacity: .85; }
+  @media (max-width: 700px) { .mandate-strip { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body class="theme-syndic" data-theme-key="syndic">
+  <header class="topbar dark">
+    <div class="wrap">
+      <a class="brand" href="syndic.html"><span class="dot">P</span><span>Résidence Le Parc<small>Extranet copropriétaires · SPI Syndic by Septeo</small></span></a>
+      <nav class="nav">
+        <a class="cta" href="operations.html">Console d'opérations</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero y-hero">
+    <div class="bg" style="background-image:url('img/syndic-hero.jpg')"></div>
+    <div class="scrim"></div>
+    <div class="wrap inner">
+      <div class="lot">🏢 Lot 12 · Bât. A · 412 / 10 000 tantièmes · Propriétaire occupant</div>
+      <h1>Bonjour Charles, votre copropriété en un coup d’œil</h1>
+      <p>Appels de charges trimestriels prélevés par mandat, appels de fonds travaux réglés ponctuellement, budget, assemblées générales et documents. Le Cabinet Vernet gère la résidence avec <strong>SPI Syndic</strong> ; les encaissements passent par <strong>Payments by Septeo</strong>.</p>
+      <div class="pills"><span class="pill">Charges par prélèvement</span><span class="pill">Travaux au ponctuel</span><span class="pill">48 lots · 2 bâtiments</span></div>
+    </div>
+  </section>
+
+  <main class="wrap">
+    <div class="portal" data-tabs-scope>
+      <aside class="portal-side">
+        <div class="portal-me"><span class="avatar">CV</span><div><b>Charles Vidal</b><small>Lot 12 · 412 tantièmes</small></div></div>
+        <nav class="portal-nav" id="pnav">
+          <button data-tab="dash">📊 Situation</button>
+          <button data-tab="charges">🧾 Appels de charges</button>
+          <button data-tab="travaux">🏗️ Travaux <span class="n">2</span></button>
+          <button data-tab="budget">📈 Budget prévisionnel</button>
+          <button data-tab="ag">🗳️ Assemblées & PV</button>
+          <button data-tab="residence">🏢 La résidence</button>
+          <button data-tab="documents">📁 Documents</button>
+        </nav>
+        <div class="person" style="align-items:flex-start"><img src="img/syn-gestionnaire.jpg" alt=""><div><div class="p-name">Julien Vernet</div><div class="p-role">Gestionnaire · Cabinet Vernet</div><div class="p-contact">04 78 00 00 00<br>Permanence mardi 17h–19h</div></div></div>
+      </aside>
+
+      <div class="portal-main">
+        <section data-panel="dash">
+          <h2>Situation de votre compte</h2>
+          <p class="lead">Au <span id="today"></span> · solde à jour hors appel en cours.</p>
+          <div class="call-card" data-reveal>
+            <div><div class="c-lab">Appel de charges · <span id="due-label"></span></div><div class="c-amt" id="due-amt"></div><div class="c-sub">Charges courantes · 412 / 10 000 tantièmes du budget trimestriel · échéance le <b id="due-date"></b></div><div style="margin-top:8px"><span class="status-pill st-due">À régler</span> <span class="hint">Prélevé automatiquement si mandat actif.</span></div></div>
+            <div class="c-actions"><button class="btn accent lg" id="pay-call">Régler cet appel</button><button class="btn ghost" data-go="charges">Activer le prélèvement</button></div>
+          </div>
+          <div class="kpis" style="margin-top:18px">
+            <div class="kpi" data-reveal><div class="k-lab">Vos charges annuelles</div><div class="k-val" id="k-year"></div><div class="k-sub">412 / 10 000 du budget</div></div>
+            <div class="kpi" data-reveal style="--i:1"><div class="k-lab">Travaux à régler</div><div class="k-val" id="k-works"></div><div class="k-sub">2 appels de fonds en cours</div></div>
+            <div class="kpi" data-reveal style="--i:2"><div class="k-lab">Fonds travaux (votre part)</div><div class="k-val">1 842,00 €</div><div class="k-sub">cumulé depuis 2019</div></div>
+            <div class="kpi dark" data-reveal style="--i:3"><div class="k-lab">Prochaine AG</div><div class="k-val" id="k-ag"></div><div class="k-sub">Convocation J-21</div></div>
+          </div>
+          <div class="mandate-strip" style="margin-top:18px" data-reveal>
+            <div><b>Prélèvement automatique des charges : non activé</b><span>Enregistrez votre moyen de paiement une fois ; chaque appel trimestriel est prélevé à l’échéance, sans relance.</span></div>
+            <button class="btn" id="pay-mandate" style="background:var(--accent)">Mettre en place le mandat</button>
+          </div>
+          <div class="panel-lt" style="margin-top:18px" data-reveal><h3>Historique de vos règlements</h3><div class="dtable-wrap"><table class="dtable"><thead><tr><th>Date</th><th>Objet</th><th>Moyen</th><th class="num">Montant</th></tr></thead><tbody id="hist"></tbody></table></div></div>
+        </section>
+
+        <section data-panel="charges" hidden>
+          <h2>Appels de charges</h2>
+          <p class="lead">Un appel par trimestre, calculé sur le budget prévisionnel voté en AG et vos 412 tantièmes. Régularisation annuelle après approbation des comptes.</p>
+          <div class="dtable-wrap"><table class="dtable"><thead><tr><th>Trimestre</th><th>Référence</th><th>Nature</th><th>Échéance</th><th class="num">Montant</th><th>Statut</th><th>Moyen</th><th></th></tr></thead><tbody id="calls"></tbody></table></div>
+          <div class="mandate-strip" style="margin-top:18px">
+            <div><b>Passer au prélèvement automatique</b><span>Mode <i>mandate</i> : l’appel courant est réglé et le moyen de paiement enregistré ; les trimestres suivants sont prélevés par SPI Syndic (transactions initiées par le marchand).</span></div>
+            <button class="btn" data-go-mandate style="background:var(--accent)">Activer le mandat</button>
+          </div>
+        </section>
+
+        <section data-panel="travaux" hidden>
+          <h2>Travaux votés</h2>
+          <p class="lead">Les appels de fonds travaux sont réglés <strong>ponctuellement</strong> (paiement immédiat), à part des charges courantes.</p>
+          <div style="display:grid;gap:16px" id="works"></div>
+        </section>
+
+        <section data-panel="budget" hidden>
+          <h2>Budget prévisionnel <span id="b-year"></span></h2>
+          <p class="lead">Voté en assemblée générale. Votre quote-part est calculée au prorata de vos tantièmes.</p>
+          <div class="grid-2" style="grid-template-columns: 1.4fr 1fr">
+            <div class="panel-lt"><h3>Répartition par poste</h3><div class="budget-bars" id="budget"></div></div>
+            <div><div class="share-box"><small>Budget total de la copropriété</small><div class="big" id="b-total"></div><small style="margin-top:10px">Votre quote-part annuelle (412 / 10 000)</small><div class="big" id="b-share"></div><small>soit <span id="b-q"></span> par trimestre</small></div>
+              <div class="panel-lt" style="margin-top:14px"><h3>Régularisation</h3><p class="muted" style="margin:0;font-size:14px">Après approbation des comptes, l’écart entre provisions appelées et dépenses réelles est régularisé. En <b id="b-prev"></b> : <b style="color:var(--ok)">+ 86,40 €</b> en votre faveur, déduits de l’appel suivant.</p></div></div>
+          </div>
+        </section>
+
+        <section data-panel="ag" hidden>
+          <h2>Assemblées générales & procès-verbaux</h2>
+          <p class="lead">Convocations, ordres du jour, résolutions votées et PV signés.</p>
+          <div style="display:grid;gap:12px" id="ags"></div>
+        </section>
+
+        <section data-panel="residence" hidden>
+          <h2>Résidence Le Parc</h2>
+          <p class="lead">24 avenue Lacassagne, Lyon 3e · 48 lots · bâtiments A & B (1996) · syndic : Cabinet Vernet & Associés.</p>
+          <div id="res-gallery"></div>
+          <div class="specs" style="margin-top:18px">
+            <div class="spec"><span class="s-ico">🏢</span><div><div class="s-lab">Lots</div><div class="s-val">48 (40 logements, 8 commerces)</div></div></div>
+            <div class="spec"><span class="s-ico">🔥</span><div><div class="s-lab">Chauffage</div><div class="s-val">Collectif gaz</div></div></div>
+            <div class="spec"><span class="s-ico">🛗</span><div><div class="s-lab">Ascenseurs</div><div class="s-val">2 · remplacés en 2024</div></div></div>
+            <div class="spec"><span class="s-ico">🌳</span><div><div class="s-lab">Espaces verts</div><div class="s-val">Jardin intérieur 900 m²</div></div></div>
+            <div class="spec"><span class="s-ico">🧹</span><div><div class="s-lab">Entretien</div><div class="s-val">3 passages / semaine</div></div></div>
+            <div class="spec"><span class="s-ico">📋</span><div><div class="s-lab">Conseil syndical</div><div class="s-val">5 membres · présidente Mme Roche</div></div></div>
+          </div>
+        </section>
+
+        <section data-panel="documents" hidden>
+          <h2>Documents de la copropriété</h2>
+          <div class="docs" id="docs"></div>
+        </section>
+      </div>
+    </div>
+
+    <section class="section">
+      <div class="dt-band" data-reveal>
+        <div>
+          <span class="eyebrow" style="color:#e2c7b0">Data travel</span>
+          <h2>Le lot, la période, la nature de l’appel</h2>
+          <p>Chaque encaissement transporte le lot, les tantièmes, la copropriété, l’échéance et le type d’appel (charges courantes vs travaux). SPI Syndic lettre automatiquement les comptes copropriétaires et suit le taux de recouvrement par résidence, par trimestre et par mode (mandat vs ponctuel).</p>
+          <div data-pbs></div>
+        </div>
+        <div class="dt-json" id="dt-json"></div>
+      </div>
+    </section>
+
+    <section class="section"><p class="note">Démo sandbox — carte de test <strong>4111 1111 1111 1111</strong> · 03/30 · 737. Rejeu du prélèvement (MIT) et moyens enregistrés dans la <a href="operations.html">console d'opérations</a>.</p></section>
+  </main>
+
+  <footer class="footer"><div class="wrap"><span>Cabinet Vernet & Associés · syndic de la Résidence Le Parc · démo sandbox</span><span>SPI Syndic — Septeo Real Estate</span></div></footer>
+
+  <script src="themes.js"></script>
+  <script src="theme-switcher.js"></script>
+  <script src="common.js"></script>
+  <script src="checkout.js"></script>
+  <script src="site.js"></script>
+  <script src="data/syndic.js"></script>
+  <script>
+    (function () {
+      var D = window.DATA_SYN, S = window.SITE;
+      var due = D.calls.filter(function (c) { return c.status === 'due'; })[0];
+      var STATUS = { paid: ['Réglé', 'st-paid'], due: ['À régler', 'st-due'], upcoming: ['À venir', 'st-upcoming'] };
+      var worksDue = 0; D.works.forEach(function (w) { w.calls.forEach(function (c) { if (c.status === 'due') worksDue += c.amount; }); });
+      document.getElementById('today').textContent = S.fmtDate(S.today(0), true);
+      document.getElementById('due-label').textContent = due.label; document.getElementById('due-amt').textContent = S.euros(due.amount); document.getElementById('due-date').textContent = S.fmtDate(due.due, true);
+      document.getElementById('k-year').textContent = S.euros(due.amount * 4); document.getElementById('k-works').textContent = S.euros(worksDue);
+      document.getElementById('k-ag').textContent = S.fmtDate(D.ag[2].date);
+      document.getElementById('hist').innerHTML = D.history.map(function (h) { return '<tr><td class="muted">' + h[0] + '</td><td><b>' + S.esc(h[1]) + '</b></td><td class="muted">' + h[3] + '</td><td class="num">' + S.euros(h[2]) + '</td></tr>'; }).join('');
+      document.getElementById('calls').innerHTML = D.calls.slice().reverse().map(function (c) {
+        var st = STATUS[c.status];
+        return '<tr class="' + (c.status === 'due' ? 'hl' : '') + '"><td><b>' + c.label + '</b></td><td class="muted">' + c.id + '</td><td>' + c.kind + '</td><td class="muted">' + S.fmtDate(c.due) + '</td><td class="num">' + S.euros(c.amount) + '</td><td><span class="status-pill ' + st[1] + '">' + st[0] + '</span></td><td class="muted">' + (c.method || '—') + '</td>' +
+          '<td>' + (c.status === 'due' ? '<button class="btn sm accent" data-checkout data-mode="immediate" data-amount="' + c.amount + '" data-label="Appel de charges ' + c.label + ' — Lot 12" data-summary=\'' + JSON.stringify([['Copropriété', D.copro.name], ['Lot', 'Lot 12 · 412 tantièmes'], ['Nature', c.kind], ['Échéance', S.fmtDate(c.due)]]) + '\' data-prefill=\'' + JSON.stringify({ period: c.label, lotRef: 'Lot 12 — Bât. A, 3e étage' }) + '\'>Régler</button>' : c.status === 'paid' ? '<button class="dl" onclick="SITE.toast(\'Reçu ' + c.id + ' téléchargé (démo)\',\'ok\')">⬇ Reçu</button>' : '<span class="hint">—</span>') + '</td></tr>';
+      }).join('');
+      document.getElementById('works').innerHTML = D.works.map(function (w, i) {
+        return '<div class="work" data-reveal style="--i:' + i + '"><img src="' + w.img + '" alt=""><div class="w-b"><span class="eyebrow">' + S.esc(w.contractor) + '</span><h3>' + S.esc(w.name) + '</h3><div class="muted" style="font-size:13.5px">' + S.esc(w.desc) + ' · montant total ' + S.euros(w.total) + ' · votre quote-part <b>' + S.euros(w.share) + '</b></div>' +
+          '<div style="margin:10px 0 4px;font-size:12.5px;color:var(--muted)">Avancement du chantier · ' + w.progress + ' %</div><div class="progress"><i style="--w:' + w.progress + '%"></i></div>' +
+          '<div class="w-calls">' + w.calls.map(function (c) { var st = STATUS[c.status]; return '<div><span>' + S.esc(c.label) + (c.due ? ' <small class="muted">· échéance ' + S.fmtDate(c.due) + '</small>' : '') + '</span><b>' + S.euros(c.amount) + '</b>' + (c.status === 'due' ? '<button class="btn sm accent" data-checkout data-mode="immediate" data-amount="' + c.amount + '" data-label="' + S.esc(w.name) + ' — ' + S.esc(c.label) + '" data-summary=\'' + JSON.stringify([['Travaux', w.name], ['Appel', c.label], ['Quote-part totale', S.euros(w.share)], ['Entreprise', w.contractor]]) + '\' data-prefill=\'' + JSON.stringify({ period: c.label + ' · ' + w.name, lotRef: 'Lot 12 — Bât. A, 3e étage' }) + '\'>Régler</button>' : '<span class="status-pill ' + st[1] + '">' + st[0] + '</span>') + '</div>'; }).join('') + '</div></div></div>';
+      }).join('');
+      var B = D.budget, share = Math.round(B.total * 412 / 10000);
+      document.getElementById('b-year').textContent = B.year; document.getElementById('b-total').textContent = S.euros(B.total); document.getElementById('b-share').textContent = S.euros(share); document.getElementById('b-q').textContent = S.euros(Math.round(share / 4)); document.getElementById('b-prev').textContent = B.year - 1;
+      var max = Math.max.apply(null, B.lines.map(function (l) { return l[1]; }));
+      document.getElementById('budget').innerHTML = B.lines.map(function (l) { return '<div><div>' + S.esc(l[0]) + '<small>votre part : ' + S.euros(Math.round(l[1] * 412 / 10000)) + '</small><i style="--w:' + Math.round(l[1] / max * 100) + '%"></i></div><b>' + S.euros(l[1]) + '</b></div>'; }).join('');
+      document.getElementById('ags').innerHTML = D.ag.map(function (a) { return '<div class="ag"><div class="ag-h"><b>' + S.esc(a.title) + '</b><span class="badge ' + (a.status.indexOf('PV') > -1 ? 'ok' : 'info') + '">' + a.status + '</span></div><div class="muted" style="font-size:13px">' + S.fmtDate(a.date, true) + '</div><ul>' + a.items.map(function (x) { return '<li>' + S.esc(x) + '</li>'; }).join('') + '</ul>' + (a.status.indexOf('PV') > -1 ? '<button class="dl" style="margin-top:10px;background:none;border:1px solid var(--line);border-radius:4px;padding:6px 10px;font:inherit;font-size:12.5px;cursor:pointer" onclick="SITE.toast(\'PV téléchargé (démo)\',\'ok\')">⬇ Télécharger le PV</button>' : '') + '</div>'; }).join('');
+      S.gallery('#res-gallery', D.copro.photos.map(function (p) { return { src: p[0], alt: p[1] }; }));
+      document.getElementById('docs').innerHTML = D.documents.map(function (d) { return '<div class="doc"><span class="d-ico">' + d.type + '</span><div class="d-main"><div class="d-name">' + S.esc(d.name) + '</div><div class="d-meta">' + S.esc(d.meta) + '</div></div><button class="dl" onclick="SITE.toast(\'Téléchargement (démo)\',\'ok\')">⬇ Télécharger</button></div>'; }).join('');
+
+      var pre = { lotRef: 'Lot 12 — Bât. A, 3e étage', coproRef: D.copro.name + ' — Lyon 3e', period: due.label, shares: '412' };
+      document.getElementById('pay-call').onclick = function () { PMS.checkout({ mode: 'immediate', amount: due.amount, itemLabel: 'Appel de charges ' + due.label + ' — Lot 12', summary: [['Copropriété', D.copro.name], ['Lot', 'Lot 12 · 412 / 10 000 tantièmes'], ['Nature', 'Charges courantes'], ['Échéance', S.fmtDate(due.due, true)]], prefill: pre }); };
+      function mandate() { PMS.checkout({ mode: 'mandate', amount: due.amount, itemLabel: 'Mandat de prélèvement des charges — Lot 12', summary: [['Copropriété', D.copro.name], ['Mandat', 'RUM-LEPARC-L12-CV · récurrent trimestriel'], ['1er prélèvement', due.label + ' · ' + S.euros(due.amount)], ['Suivants', 'à chaque échéance trimestrielle']], prefill: Object.assign({ paymentDay: 'Le 5 du mois' }, pre) }); }
+      document.getElementById('pay-mandate').onclick = mandate;
+      document.querySelectorAll('[data-go-mandate]').forEach(function (b) { b.onclick = mandate; });
+      var go = S.tabs('#pnav');
+      document.querySelectorAll('[data-go]').forEach(function (b) { b.onclick = function () { go(b.getAttribute('data-go')); window.scrollTo({ top: document.querySelector('.portal').offsetTop - 80, behavior: 'smooth' }); }; });
+      var j = { shopper: { firstName: 'Charles', lastName: 'Vidal', email: 'charles.vidal@example.fr' }, metadata: { vertical: 'syndic', coproRef: D.copro.name, lotRef: 'Lot 12 — Bât. A', shares: 412, period: due.label, ownerType: 'Propriétaire occupant', callType: 'Charges courantes', paymentDay: 'Le 5 du mois', mode: 'mandate' } };
+      document.getElementById('dt-json').innerHTML = JSON.stringify(j, null, 2).replace(/"([^"]+)":/g, '<span class="k">"$1"</span>:').replace(/: "([^"]*)"/g, ': <span class="s">"$1"</span>').replace(/: (\d+)/g, ': <span class="n">$1</span>');
+      S.reveal();
+    })();
+  </script>
+</body>
+</html>

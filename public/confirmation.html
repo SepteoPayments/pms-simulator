@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Confirmation — Payments by Septeo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="styles.css" /><link rel="stylesheet" href="ui.css" /><link rel="stylesheet" href="skins.css" />
+<style>
+  body.conf { font-family: var(--font-body); }
+  .conf .wrap { max-width: 860px; }
+  .conf-top { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 18px 0 0; flex-wrap: wrap; }
+  .conf-top .pbs { color: var(--brand); }
+  .conf-band { border-radius: var(--radius); }
+  .conf-band .cb-right { margin-left: auto; text-align: right; font-size: 12px; opacity: .85; }
+  .conf-card { position: relative; overflow: hidden; }
+  .conf-card::before { content: ''; position: absolute; right: -60px; top: -60px; width: 220px; height: 220px; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--accent) 22%, transparent), transparent 70%); pointer-events: none; }
+  .conf-check { animation: popIn .5s cubic-bezier(.2,1.4,.4,1); }
+  @keyframes popIn { from { transform: scale(.4); opacity: 0; } to { transform: none; opacity: 1; } }
+  .conf-mode { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; margin: 6px 0 14px; }
+  .conf-mode i { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  .next-steps { margin-top: 18px; }
+  .segment { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .segment span { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: color-mix(in srgb, var(--accent) 12%, var(--surface)); color: var(--accent-ink, var(--brand)); }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
+  .stats div { background: var(--bg); border-radius: 12px; padding: 12px 14px; }
+  .stats b { display: block; font-size: 20px; color: var(--brand); font-family: var(--font-head); }
+  .stats span { font-size: 12px; color: var(--muted); }
+  @media (max-width: 620px) { .stats { grid-template-columns: 1fr; } }
+  .conf-actions { align-items: center; }
+  .conf-actions .pbs { margin-left: auto; color: var(--muted); }
+  .conf-mail-body .sig { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 12px; }
+</style>
+</head>
+<body class="conf">
+  <main class="wrap" id="root"></main>
+  <script src="themes.js"></script>
+  <script src="site.js"></script>
+  <script>
+    (function () {
+      var S = window.SITE;
+      function euros(m, c) { try { return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: c || 'EUR' }).format((m || 0) / 100); } catch (e) { return ((m || 0) / 100).toFixed(2) + ' €'; } }
+      var esc = S.esc;
+      var LABELS = { room: 'Chambre', stay: 'Hébergement', property: 'Logement / bien', treatment: 'Soin', checkIn: 'Arrivée', checkOut: 'Départ', nights: 'Nuits', guests: 'Voyageurs', adults: 'Adultes', children: 'Enfants', pax: 'Personnes', pets: 'Animaux', vehicle: 'Immatriculation', acsi: 'Carte ACSI', purpose: 'Motif', arrival: 'Heure d’arrivée', loyalty: 'Fidélité', requests: 'Demandes spéciales', slot: 'Date', time: 'Heure', practitioner: 'Praticien(ne)', health: 'Contre-indications', gift: 'Destinataire', linen: 'Linge', leaseRef: 'Réf. bail', period: 'Période', tenantType: 'Qualité', paymentDay: 'Jour de prélèvement', iban: 'IBAN', lotRef: 'Lot', coproRef: 'Copropriété', ownerType: 'Qualité', shares: 'Tantièmes', propertyRef: 'Réf. mandat', notaryRef: 'Étude', buyerType: 'Acquéreur', financing: 'Financement', coBuyer: 'Co-acquéreur', signingDate: 'Signature', covers: 'Couverts', service: 'Service', date: 'Date', table: 'Table', occasion: 'Occasion', allergies: 'Allergies', vertical: null };
+      var MODE = { immediate: ['Paiement immédiat', 'Le montant a été autorisé et sera capturé automatiquement.', ['Le pspReference arrive par le webhook AUTHORISATION.', 'Remboursement total ou partiel possible depuis la console.']], caution: ['Empreinte de garantie', 'Le montant est pré-autorisé (gelé), rien n’est débité.', ['Capture totale ou partielle au moment venu (départ, état des lieux, no-show).', 'Ajustement du montant, prolongation de validité ou libération depuis la console.']], mandate: ['Mandat de prélèvement', 'Le moyen de paiement est enregistré pour les prochaines échéances.', ['Le token (storedPaymentMethodId) arrive par le webhook AUTHORISATION.', 'Les échéances suivantes sont rejouées en MIT depuis la console (« Rejouer »).']] };
+      function guessMode(r) { var l = (r.itemLabel || '').toLowerCase(); if (/prélèvement|mandat/.test(l)) return 'mandate'; if (/garantie|empreinte|caution|dépôt/.test(l)) return 'caution'; return 'immediate'; }
+
+      var r; try { r = JSON.parse(sessionStorage.getItem('pms_reservation') || 'null'); } catch (e) { r = null; }
+      var root = document.getElementById('root');
+      if (!r) {
+        document.body.classList.add('theme-septeo');
+        root.innerHTML = '<div class="conf-top"><div data-pbs></div></div><div class="conf-card" style="margin-top:30px;text-align:center"><div class="e-ico" style="font-size:40px">🧭</div><h1>Aucune confirmation à afficher</h1><p class="muted">La session a expiré ou aucun paiement récent n’a été effectué.</p><a class="btn" href="index.html">Retour à l’accueil</a></div>';
+        S.brand(); return;
+      }
+      var theme = (window.THEME_BY_KEY && window.THEME_BY_KEY[r.theme]) || {};
+      document.body.className = 'conf theme-' + (r.theme || 'septeo');
+      if (theme.fonts) { var lk = document.createElement('link'); lk.rel = 'stylesheet'; lk.href = theme.fonts; document.head.appendChild(lk); }
+      var accent = r.accent || theme.accent || '#14324f';
+      var name = (r.shopper && r.shopper.firstName) || 'client', mail = (r.shopper && r.shopper.email) || '';
+      var meta = r.metadata || {}, mode = guessMode(r), md = MODE[mode];
+      var rows = Object.keys(meta).filter(function (k) { return LABELS[k] !== null && meta[k]; }).map(function (k) { var v = meta[k]; if (/^\d{4}-\d{2}-\d{2}$/.test(v)) v = S.fmtDate(v, true); return '<li><span>' + esc(LABELS[k] || k) + '</span><span>' + esc(v) + '</span></li>'; }).join('');
+      var addr = r.shopper && r.shopper.billingAddress ? [r.shopper.billingAddress.street, r.shopper.billingAddress.postalCode, r.shopper.billingAddress.city].filter(Boolean).join(', ') : '';
+      var age = r.shopper && r.shopper.dateOfBirth ? Math.floor((Date.now() - new Date(r.shopper.dateOfBirth)) / 31557600000) : null;
+      var seg = [];
+      if (age) seg.push(age < 30 ? '18–29 ans' : age < 45 ? '30–44 ans' : age < 60 ? '45–59 ans' : '60 ans +');
+      if (r.shopper && r.shopper.billingAddress && r.shopper.billingAddress.city) seg.push(r.shopper.billingAddress.city);
+      ['purpose', 'loyalty', 'tenantType', 'ownerType', 'buyerType', 'financing', 'occasion', 'service', 'gift', 'pets'].forEach(function (k) { if (meta[k]) seg.push(meta[k]); });
+      if (meta.guests) seg.push(meta.guests + ' voyageur(s)'); if (meta.covers) seg.push(meta.covers + ' couverts'); if (meta.children && Number(meta.children) > 0) seg.push('famille');
+      var when = new Date(r.at || Date.now());
+      var fem = r.noun === 'Réservation';
+
+      root.innerHTML =
+        '<div class="conf-top"><a href="' + esc(theme.page || 'index.html') + '" class="brand" style="text-decoration:none"><span class="dot" style="background:' + accent + '">' + (r.emoji || '💳') + '</span><span>' + esc(theme.brand || r.themeName) + '<small>' + esc(theme.brandSub || r.themeProduct || '') + '</small></span></a><div data-pbs></div></div>' +
+        '<div class="conf-band" style="--accent:' + accent + '"><span class="conf-logo">' + (r.emoji || '💳') + '</span><div><b>' + esc(theme.brand || r.themeName) + '</b><small>' + esc(r.themeName) + ' · ' + esc(r.themeProduct || '') + '</small></div><div class="cb-right">' + when.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) + '<br>' + when.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) + '</div></div>' +
+        '<div class="conf-card">' +
+          '<div class="conf-check" style="background:' + accent + '">✓</div>' +
+          '<h1>' + esc(r.noun) + ' confirmé' + (fem ? 'e' : '') + ', ' + esc(name) + ' !</h1>' +
+          '<p class="conf-sub">' + esc(r.itemLabel) + ' — <b>' + euros(r.amount, r.currency) + '</b>. Statut Adyen : <b>' + esc(r.resultCode) + '</b>.</p>' +
+          '<div class="conf-mode"><i></i><b>' + md[0] + '</b> · ' + md[1] + '</div>' +
+          '<div class="conf-grid">' +
+            '<div class="conf-block"><h3>Détails</h3><ul class="conf-list"><li><span>Référence</span><span>' + esc(r.reference || '—') + '</span></li><li><span>Montant</span><span>' + euros(r.amount, r.currency) + '</span></li><li><span>Mode</span><span>' + mode + '</span></li>' + rows + '</ul></div>' +
+            '<div class="conf-block"><h3>Client</h3><ul class="conf-list"><li><span>Nom</span><span>' + esc(((r.shopper && r.shopper.firstName) || '') + ' ' + ((r.shopper && r.shopper.lastName) || '')) + '</span></li><li><span>E-mail</span><span>' + esc(mail) + '</span></li>' + (r.shopper && r.shopper.phone ? '<li><span>Téléphone</span><span>' + esc(r.shopper.phone) + '</span></li>' : '') + (r.shopper && r.shopper.dateOfBirth ? '<li><span>Naissance</span><span>' + S.fmtDate(r.shopper.dateOfBirth, true) + (age ? ' (' + age + ' ans)' : '') + '</span></li>' : '') + (addr ? '<li><span>Adresse</span><span>' + esc(addr) + '</span></li>' : '') + '</ul>' +
+              '<h3 style="margin-top:14px">Segment client (data travel)</h3><div class="segment">' + seg.map(function (s) { return '<span>' + esc(s) + '</span>'; }).join('') + '</div><p class="hint" style="margin-top:8px">Ces attributs voyagent avec le paiement et alimentent les statistiques par type de client.</p></div>' +
+          '</div>' +
+          '<div class="next-steps"><h3 style="margin:0 0 8px;font-size:14px">Et maintenant, côté logiciel métier</h3><ul class="perks">' + md[2].map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '<li>Webhook reçu → rapprochement automatique dans ' + esc(r.themeProduct || 'le PMS') + '.</li></ul></div>' +
+          '<div class="stats"><div><b>' + euros(r.amount, r.currency) + '</b><span>ajoutés au segment « ' + esc(seg[0] || 'client') + ' »</span></div><div><b>' + (mode === 'caution' ? '0,00 €' : euros(r.amount, r.currency)) + '</b><span>' + (mode === 'caution' ? 'débités aujourd’hui (empreinte)' : 'encaissés aujourd’hui') + '</span></div><div><b>' + (mode === 'mandate' ? '∞' : '1') + '</b><span>' + (mode === 'mandate' ? 'échéances rejouables (MIT)' : 'transaction tracée') + '</span></div></div>' +
+        '</div>' +
+        '<div class="conf-mail">' +
+          '<div class="conf-mail-head"><span class="dot">✉</span> E-mail de confirmation <em>(simulé)</em></div>' +
+          '<div class="conf-mail-body">' +
+            '<div class="conf-mail-meta"><b>À :</b> ' + esc(mail) + ' &nbsp; <b>De :</b> ' + esc(theme.brand || r.themeName) + ' &lt;no-reply@' + esc((theme.brand || 'septeo').toLowerCase().replace(/[^a-z]+/g, '-')) + '.fr&gt;<br><b>Objet :</b> Votre ' + esc(r.noun.toLowerCase()) + ' est confirmé' + (fem ? 'e' : '') + ' — ' + esc(r.reference || '') + '</div>' +
+            '<p>Bonjour ' + esc(name) + ',</p>' +
+            '<p>Nous confirmons votre ' + esc(r.noun.toLowerCase()) + ' « <b>' + esc(r.itemLabel) + '</b> » pour un montant de <b>' + euros(r.amount, r.currency) + '</b> (réf. ' + esc(r.reference || '—') + ').' + (mode === 'caution' ? ' Il s’agit d’une <b>empreinte de garantie</b> : aucun débit n’a été effectué.' : mode === 'mandate' ? ' Votre moyen de paiement est enregistré pour les prochaines échéances ; vous serez notifié 3 jours avant chaque prélèvement.' : '') + '</p>' +
+            '<p>Merci de votre confiance,<br>L’équipe ' + esc(theme.brand || r.themeName) + '</p>' +
+            '<div class="sig"><span>Paiement sécurisé par</span><span data-pbs="compact"></span></div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="conf-actions">' +
+          '<a class="btn" style="background:' + accent + '" href="' + esc(theme.page || 'index.html') + '">← Retour à ' + esc(theme.brand || 'l’univers') + '</a>' +
+          '<a class="btn ghost" href="index.html">Autre univers</a>' +
+          '<a class="btn ghost" href="operations.html">Console d’opérations</a>' +
+        '</div>';
+      S.brand();
+    })();
+  </script>
+</body>
+</html>

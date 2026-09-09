@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Spa Émeraude — Aix-en-Provence · Soins, rituels & bons cadeaux</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=Mulish:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="styles.css" /><link rel="stylesheet" href="ui.css" /><link rel="stylesheet" href="skins.css" />
+<link rel="stylesheet" href="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.68.0/adyen.css" />
+<script src="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.68.0/adyen.js"></script>
+<style>
+  .s-hero { min-height: 78vh; display: flex; align-items: center; }
+  .s-hero .inner { padding: 80px 0; }
+  .s-hero h1 { font-size: clamp(38px, 6vw, 70px); font-weight: 400; max-width: 16ch; line-height: 1.02; }
+  .s-hero .leaf { font-size: 40px; display: block; margin-bottom: 6px; animation: floatY 5s ease-in-out infinite; }
+  @keyframes floatY { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  .cat-filter { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 22px; }
+  .cat-filter button { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 8px 16px; font: inherit; font-size: 13.5px; cursor: pointer; color: var(--muted); font-weight: 600; transition: all .15s; }
+  .cat-filter button.on, .cat-filter button:hover { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .treat-card .c-photo { aspect-ratio: 4/3; }
+  .treat-card .dur { position: absolute; left: 12px; bottom: 12px; background: rgba(255,255,255,.92); color: var(--brand); font-weight: 700; font-size: 12px; padding: 4px 9px; border-radius: 999px; }
+  .treat-card .c-body { gap: 6px; }
+  .treat-card .who { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--muted); }
+  .treat-card .who img { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; margin-left: -8px; border: 2px solid var(--surface); }
+  .treat-card .who img:first-child { margin-left: 0; }
+  .team { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; }
+  .team .tm { text-align: center; background: var(--surface); border: 1px solid var(--line); border-radius: 22px; padding: 22px 18px; transition: transform .15s, box-shadow .15s; }
+  .team .tm:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+  .team .tm img { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; margin: 0 auto 10px; border: 4px solid #eaf0e6; }
+  .team .tm b { display: block; font-family: var(--font-head); font-size: 18px; }
+  .team .tm span { display: block; font-size: 12.5px; color: var(--brand-2); font-weight: 600; margin: 2px 0 8px; }
+  .team .tm p { font-size: 13px; color: var(--muted); margin: 0; line-height: 1.5; }
+  .cures { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
+  .cure { display: grid; grid-template-columns: 110px 1fr; gap: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 20px; overflow: hidden; }
+  .cure img { width: 100%; height: 100%; object-fit: cover; }
+  .cure .cu-b { padding: 14px 16px 14px 0; display: flex; flex-direction: column; gap: 4px; }
+  .cure b { font-family: var(--font-head); font-size: 17px; }
+  .cure .cu-d { font-size: 12.5px; color: var(--muted); flex: 1; }
+  .cure .cu-p { display: flex; align-items: baseline; gap: 8px; }
+  .cure .cu-p strong { font-size: 18px; color: var(--brand); }
+  .cure .cu-p small { color: var(--ok); font-weight: 700; font-size: 12px; }
+  .gift { background: linear-gradient(135deg, #2f6b53, #4f8f6f); color: #fff; border-radius: 26px; padding: 30px 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center; position: relative; overflow: hidden; }
+  .gift::after { content: '🎁'; position: absolute; right: -10px; bottom: -30px; font-size: 180px; opacity: .12; transform: rotate(-12deg); }
+  .gift h2 { color: #fff; margin: 0 0 8px; font-size: 30px; }
+  .gift p { color: rgba(255,255,255,.85); margin: 0 0 16px; font-size: 14.5px; }
+  .gift .amounts { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .gift .amounts button { border: 1.5px solid rgba(255,255,255,.4); background: rgba(255,255,255,.08); color: #fff; border-radius: 999px; padding: 9px 16px; font: inherit; font-weight: 700; cursor: pointer; }
+  .gift .amounts button.on { background: #fff; color: var(--brand); border-color: #fff; }
+  .gift .g-card { background: #fff; color: var(--ink); border-radius: 18px; padding: 20px 22px; box-shadow: 0 20px 50px rgba(0,0,0,.25); transform: rotate(-2deg); position: relative; z-index: 1; }
+  .gift .g-card .gc-top { display: flex; justify-content: space-between; align-items: center; font-family: var(--font-head); color: var(--brand); font-size: 18px; }
+  .gift .g-card .gc-amt { font-size: 40px; font-family: var(--font-head); color: var(--brand); margin: 14px 0 6px; }
+  .gift .g-card .gc-for { font-size: 13px; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 10px; }
+  .gift .g-card input { border: none; border-bottom: 1px dashed var(--line); font: inherit; width: 100%; padding: 4px 0; outline: none; }
+  @media (max-width: 800px) { .gift { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body class="theme-spa" data-theme-key="spa">
+  <header class="topbar">
+    <div class="wrap">
+      <a class="brand" href="spa.html"><span class="dot">É</span><span>Spa Émeraude<small>Aix-en-Provence · Nymphea by Septeo</small></span></a>
+      <nav class="nav">
+        <a href="#soins">Soins</a>
+        <a href="#cures">Cures</a>
+        <a href="#cadeau">Bons cadeaux</a>
+        <button class="cartbtn" id="open-cart">🧺 Panier <span class="count" id="cart-count">0</span></button>
+        <a class="cta" href="operations.html">Console</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero s-hero">
+    <div class="bg" style="background-image:url('img/spa-hero.jpg')"></div>
+    <div class="scrim"></div>
+    <div class="wrap inner">
+      <span class="leaf">🌿</span>
+      <span class="eyebrow" style="color:#cfe3d5">Spa Émeraude · Cours Mirabeau · Aix-en-Provence</span>
+      <h1>Le temps s’arrête au bout du cours Mirabeau</h1>
+      <p>Massages, rituels orientaux, soins du visage bio. Réglez vos soins en ligne, <strong>garantissez un créneau premium par une empreinte</strong> (rien n’est débité si vous venez) ou <strong>offrez un bon cadeau</strong>. Le logiciel Nymphea et Payments by Septeo font le reste.</p>
+      <div class="pills"><span class="pill">Paiement en ligne</span><span class="pill">Caution no-show</span><span class="pill">Bons cadeaux</span><span class="pill">TPE à l’accueil</span></div>
+    </div>
+  </section>
+
+  <main class="wrap">
+    <section class="section" id="soins">
+      <div class="sec-head"><div><span class="eyebrow">La carte des soins</span><h2>Choisissez votre moment</h2><p class="lead">Cliquez sur un soin pour découvrir son déroulé, ses bienfaits, la praticienne et réserver un créneau. Ou ajoutez-en plusieurs au panier pour régler en une fois.</p></div></div>
+      <div class="cat-filter" id="cats"></div>
+      <div class="cards" id="treatments"></div>
+    </section>
+
+    <section class="section" id="equipe">
+      <div class="sec-head"><div><span class="eyebrow">L’équipe</span><h2>Des mains qui savent</h2></div></div>
+      <div class="team" id="team"></div>
+    </section>
+
+    <section class="section" id="cures">
+      <div class="sec-head"><div><span class="eyebrow">Forfaits & cures</span><h2>Revenir, c’est encore mieux</h2><p class="lead">Les cures sont payées en une fois (capture immédiate) et consommées séance après séance dans Nymphea.</p></div></div>
+      <div class="cures" id="cures-grid"></div>
+    </section>
+
+    <section class="section" id="cadeau">
+      <div class="gift" data-reveal>
+        <div>
+          <span class="eyebrow" style="color:#cfe3d5">Bon cadeau</span>
+          <h2>Offrez une parenthèse</h2>
+          <p>Choisissez un montant ou un soin, personnalisez le message : le bon est envoyé par e-mail dès le paiement validé, valable un an dans tout le spa.</p>
+          <div class="amounts" id="gift-amounts"></div>
+          <button class="btn" id="gift-pay" style="background:#fff;color:var(--brand)">Offrir ce bon cadeau</button>
+        </div>
+        <div class="g-card">
+          <div class="gc-top"><span>Spa Émeraude</span><span>🌿</span></div>
+          <div class="gc-amt" id="gc-amt">89,00 €</div>
+          <div class="gc-for">Pour : <input id="gc-for" value="Maman" placeholder="Prénom du destinataire"></div>
+          <div class="gc-for" style="border:none;padding-top:6px">Message : <input id="gc-msg" value="Bonne fête, prends soin de toi !" placeholder="Votre message"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="grid-2">
+        <div class="panel-lt" data-reveal>
+          <h3>💳 Régler à l’accueil (TPE)</h3>
+          <p class="muted" style="font-size:14px">Le terminal de paiement de l’accueil est piloté par Nymphea via l’API Terminal (Adyen). Nécessite un terminal enregistré (POIID) — en démo, l’appel est réel mais renvoie 501.</p>
+          <button class="btn ghost" data-pay="immediate" data-pos="1">Payer au TPE</button>
+        </div>
+        <div class="panel-lt" data-reveal style="--i:1">
+          <h3>📊 Ce que Nymphea apprend de ses clients</h3>
+          <p class="muted" style="font-size:14px">Chaque paiement transporte le soin, le créneau, la praticienne, le motif (pour soi / cadeau) et les contre-indications déclarées : taux de no-show par créneau, panier moyen par praticienne, saisonnalité des bons cadeaux.</p>
+          <div class="chips"><span class="chip-t acc">no-show : 1,8 %</span><span class="chip-t acc">panier moyen : 96 €</span><span class="chip-t acc">bons cadeaux : 31 % en déc.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section"><p class="note">Démo sandbox — carte de test <strong>4111 1111 1111 1111</strong> · 03/30 · 737. Gestion post-paiement (capture de la caution no-show, remboursement) dans la <a href="operations.html">console d'opérations</a>.</p></section>
+  </main>
+
+  <footer class="footer"><div class="wrap"><span>Spa Émeraude · 8 cours Mirabeau, Aix-en-Provence · démo sandbox</span><span>Logiciel Nymphea — Septeo Hospitality</span></div></footer>
+
+  <script src="themes.js"></script>
+  <script src="theme-switcher.js"></script>
+  <script src="common.js"></script>
+  <script src="checkout.js"></script>
+  <script src="site.js"></script>
+  <script src="data/spa.js"></script>
+  <script>
+    (function () {
+      var D = window.DATA_SPA, S = window.SITE;
+      var P = {}; D.practitioners.forEach(function (p) { P[p.id] = p; });
+      var cats = ['Tous']; D.treatments.forEach(function (t) { if (cats.indexOf(t.cat) < 0) cats.push(t.cat); });
+      var cur = 'Tous';
+      document.getElementById('cats').innerHTML = cats.map(function (c) { return '<button type="button" data-c="' + c + '" class="' + (c === cur ? 'on' : '') + '">' + c + '</button>'; }).join('');
+      document.querySelectorAll('#cats button').forEach(function (b) { b.onclick = function () { cur = b.getAttribute('data-c'); document.querySelectorAll('#cats button').forEach(function (x) { x.classList.toggle('on', x === b); }); render(); }; });
+
+      function render() {
+        var host = document.getElementById('treatments');
+        var list = D.treatments.filter(function (t) { return cur === 'Tous' || t.cat === cur; });
+        host.innerHTML = list.map(function (t, i) {
+          return '<div class="card treat-card" data-reveal style="--i:' + (i % 3) + '">' +
+            '<a class="c-photo" href="spa-soin.html?id=' + t.id + '"><img src="' + t.photos[0][0] + '" alt="' + S.esc(t.name) + '" loading="lazy"><div class="badges"><span class="badge acc">' + S.esc(t.badge) + '</span>' + (t.premium ? '<span class="badge">Créneau premium</span>' : '') + '</div><span class="dur">⏱ ' + t.duration + ' min</span></a>' +
+            '<div class="c-body"><div class="c-title"><h3><a href="spa-soin.html?id=' + t.id + '" style="text-decoration:none;color:inherit">' + S.esc(t.name) + '</a></h3></div>' +
+            '<div class="c-meta">' + S.stars(t.rating, t.reviewsCount) + '</div>' +
+            '<p class="c-desc">' + S.esc(t.tagline) + '. ' + S.esc(t.benefits[0]) + '.</p>' +
+            '<div class="who">' + t.practitioners.map(function (pid) { return '<img src="' + P[pid].photo + '" alt="' + S.esc(P[pid].name) + '" title="' + S.esc(P[pid].name) + '">'; }).join('') + '<span>' + t.practitioners.map(function (pid) { return P[pid].name.split(' ')[0]; }).join(' · ') + '</span></div>' +
+            '<div class="c-foot"><div class="c-price">' + S.euros(t.price) + '<small>' + t.cat + ' · ' + t.duration + ' min</small></div><a class="c-go" href="spa-soin.html?id=' + t.id + '">Voir le soin</a></div>' +
+            '<div class="c-actions"><button class="btn sm ghost" data-add data-id="' + t.id + '" data-name="' + S.esc(t.name) + '" data-price="' + t.price + '" data-img="' + t.photos[0][0] + '">+ Panier</button><a class="btn sm" href="spa-soin.html?id=' + t.id + '#reserver">Réserver</a></div>' +
+            '</div></div>';
+        }).join('');
+        S.reveal();
+      }
+      render();
+
+      document.getElementById('team').innerHTML = D.practitioners.map(function (p, i) { return '<div class="tm" data-reveal style="--i:' + i + '"><img src="' + p.photo + '" alt="' + S.esc(p.name) + '"><b>' + S.esc(p.name) + '</b><span>' + S.esc(p.role) + '</span><p>' + S.esc(p.bio) + '</p></div>'; }).join('');
+      document.getElementById('cures-grid').innerHTML = D.cures.map(function (c, i) {
+        return '<div class="cure" data-reveal style="--i:' + i + '"><img src="' + c.img + '" alt="" loading="lazy"><div class="cu-b"><b>' + S.esc(c.name) + '</b><div class="cu-d">' + S.esc(c.desc) + '</div><div class="cu-p"><strong>' + S.euros(c.price) + '</strong><small>−' + S.euros(c.save) + '</small></div><div class="row"><button class="btn sm ghost" data-add data-id="' + c.id + '" data-name="' + S.esc(c.name) + '" data-price="' + c.price + '" data-img="' + c.img + '">+ Panier</button><button class="btn sm" data-checkout data-mode="immediate" data-amount="' + c.price + '" data-label="' + S.esc(c.name) + '" data-summary=\'' + JSON.stringify([['Forfait', c.name], ['Économie', S.euros(c.save)], ['Validité', '12 mois']]) + '\' data-prefill=\'' + JSON.stringify({ treatment: c.name }) + '\'>Acheter</button></div></div></div>';
+      }).join('');
+
+      // bon cadeau
+      var giftAmt = D.gifts[1];
+      var ga = document.getElementById('gift-amounts');
+      ga.innerHTML = D.gifts.map(function (g) { return '<button type="button" data-a="' + g + '" class="' + (g === giftAmt ? 'on' : '') + '">' + S.eurosInt(g) + '</button>'; }).join('');
+      ga.querySelectorAll('button').forEach(function (b) { b.onclick = function () { giftAmt = Number(b.getAttribute('data-a')); ga.querySelectorAll('button').forEach(function (x) { x.classList.toggle('on', x === b); }); document.getElementById('gc-amt').textContent = S.euros(giftAmt); }; });
+      document.getElementById('gift-pay').onclick = function () {
+        var who = document.getElementById('gc-for').value || 'un proche', msg = document.getElementById('gc-msg').value;
+        PMS.checkout({ mode: 'immediate', amount: giftAmt, itemLabel: 'Bon cadeau Spa Émeraude — ' + S.euros(giftAmt), summary: [['Destinataire', who], ['Message', msg || '—'], ['Validité', '12 mois · tous les soins'], ['Envoi', 'E-mail dès validation']], prefill: { treatment: 'Bon cadeau ' + S.euros(giftAmt), gift: 'Bon cadeau (offrir)' } });
+      };
+      S.reveal();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+# secrets — jamais committes
+private.pem
+*.pem
+.env
+
+# node
+node_modules/
+
+# os / editeur
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Soin — Spa Émeraude</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=Mulish:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="styles.css" /><link rel="stylesheet" href="ui.css" /><link rel="stylesheet" href="skins.css" />
+<link rel="stylesheet" href="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.68.0/adyen.css" />
+<script src="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.68.0/adyen.js"></script>
+<style>
+  .dur-bar { display: flex; gap: 3px; height: 34px; border-radius: 10px; overflow: hidden; margin: 8px 0 14px; }
+  .dur-bar span { display: grid; place-items: center; font-size: 11px; color: #fff; background: var(--brand-2); font-weight: 600; white-space: nowrap; overflow: hidden; }
+  .dur-bar span:nth-child(odd) { background: var(--brand); }
+  .amb { background: linear-gradient(135deg, #eef3ea, #f7f8f3); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px; display: flex; gap: 14px; align-items: center; }
+  .amb .a-ico { font-size: 30px; }
+  .amb b { display: block; font-family: var(--font-head); font-size: 17px; }
+  .amb span { font-size: 13.5px; color: var(--muted); }
+  .contra { background: var(--warnbg); color: var(--warn); border-radius: 12px; padding: 10px 14px; font-size: 13px; display: flex; gap: 8px; align-items: flex-start; }
+  .slot-day { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: thin; }
+  .slot-day button { flex: none; border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 8px 10px; font: inherit; font-size: 12px; cursor: pointer; min-width: 64px; display: flex; flex-direction: column; align-items: center; line-height: 1.2; }
+  .slot-day button b { font-size: 16px; }
+  .slot-day button.on { background: var(--brand); color: #fff; border-color: var(--brand); }
+  .slot-time { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 8px; }
+  .slot-time button { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 7px 4px; font: inherit; font-size: 12.5px; cursor: pointer; }
+  .slot-time button.on { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; }
+  .slot-time button.off { text-decoration: line-through; color: #c5c9c0; cursor: not-allowed; background: transparent; }
+  .prac-pick { display: grid; gap: 8px; }
+  .gift-toggle { display: flex; align-items: center; gap: 10px; background: var(--bg); border-radius: 12px; padding: 10px 12px; margin-top: 10px; font-size: 13px; cursor: pointer; }
+  .gift-toggle input { accent-color: var(--accent); width: 18px; height: 18px; }
+</style>
+</head>
+<body class="theme-spa" data-theme-key="spa">
+  <header class="topbar">
+    <div class="wrap">
+      <a class="brand" href="spa.html"><span class="dot">É</span><span>Spa Émeraude<small>Aix-en-Provence · Nymphea by Septeo</small></span></a>
+      <nav class="nav">
+        <a href="spa.html#soins">Soins</a>
+        <a href="spa.html#cures">Cures</a>
+        <a href="spa.html#cadeau">Bons cadeaux</a>
+        <button class="cartbtn" id="open-cart">🧺 Panier <span class="count" id="cart-count">0</span></button>
+        <a class="cta" href="operations.html">Console</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap" id="root"></main>
+
+  <footer class="footer"><div class="wrap"><span>Spa Émeraude · 8 cours Mirabeau, Aix-en-Provence · démo sandbox</span><span>Logiciel Nymphea — Septeo Hospitality</span></div></footer>
+
+  <script src="themes.js"></script>
+  <script src="theme-switcher.js"></script>
+  <script src="common.js"></script>
+  <script src="checkout.js"></script>
+  <script src="site.js"></script>
+  <script src="data/spa.js"></script>
+  <script>
+    (function () {
+      var D = window.DATA_SPA, S = window.SITE, root = document.getElementById('root');
+      var P = {}; D.practitioners.forEach(function (p) { P[p.id] = p; });
+      var id = S.qs('id') || 'signature';
+      var T = D.treatments.filter(function (t) { return t.id === id; })[0];
+      if (!T) { root.innerHTML = '<div class="empty-state" style="margin:60px 0"><div class="e-ico">🌿</div><h2>Soin introuvable</h2><p><a href="spa.html#soins">Retour à la carte des soins</a></p></div>'; return; }
+      document.title = T.name + ' — Spa Émeraude';
+      var st = { day: S.today(2), time: null, prac: T.practitioners[0], gift: false };
+      var photos = T.photos.map(function (p) { return { src: p[0], alt: p[1] }; });
+      var totalMin = T.steps.reduce(function (s, x) { return s + x[2]; }, 0);
+
+      root.innerHTML =
+        '<nav class="crumbs"><a href="index.html">Univers</a><span class="sep">›</span><a href="spa.html">Spa Émeraude</a><span class="sep">›</span><a href="spa.html#soins">' + S.esc(T.cat) + '</a><span class="sep">›</span><b>' + S.esc(T.name) + '</b></nav>' +
+        '<div class="fiche-head"><div><span class="eyebrow">' + S.esc(T.cat) + ' · ' + S.esc(T.badge) + '</span><h1>' + S.esc(T.name) + '</h1>' +
+          '<div class="sub">' + S.stars(T.rating, T.reviewsCount) + '<span class="dot-sep">⏱ ' + T.duration + ' min</span><span class="dot-sep">' + T.practitioners.map(function (p) { return P[p].name; }).join(' · ') + '</span></div></div>' +
+          '<div class="aside"><div class="from">le soin</div><div class="price-big">' + S.euros(T.price) + '</div></div></div>' +
+        '<div class="fiche-grid">' +
+          '<div class="fiche-main">' +
+            '<div id="gallery"></div>' +
+            '<div class="amb" data-reveal><span class="a-ico">🕯️</span><div><b>Ambiance</b><span>' + S.esc(T.ambiance) + '</span></div></div>' +
+            '<section data-reveal><h2>Le soin</h2><div class="prose"><p><em>' + S.esc(T.tagline) + '.</em></p><p>' + S.esc(T.desc) + '</p></div></section>' +
+            '<section data-reveal><h2>Déroulé, minute par minute</h2><div class="dur-bar">' + T.steps.map(function (s) { return '<span style="flex:' + s[2] + '" title="' + S.esc(s[0]) + '">' + s[2] + '’</span>'; }).join('') + '</div>' +
+              '<ol class="steps">' + T.steps.map(function (s) { return '<li><div><div class="st-t">' + S.esc(s[0]) + '</div><div class="st-d">' + S.esc(s[1]) + '</div></div><span class="st-min">' + s[2] + ' min</span></li>'; }).join('') + '</ol>' +
+              '<p class="hint" style="margin-top:8px">Durée totale ' + totalMin + ' min, dont ' + T.duration + ' min de soin effectif.</p></section>' +
+            '<section data-reveal><h2>Bienfaits</h2><ul class="perks">' + T.benefits.map(function (b) { return '<li>' + S.esc(b) + '</li>'; }).join('') + '</ul><div class="contra" style="margin-top:14px"><span>⚠️</span><span>' + S.esc(T.contra) + '</span></div></section>' +
+            '<section data-reveal id="praticiens"><h2>Votre praticien(ne)</h2><p class="hint" style="margin:0 0 10px">Choisissez qui vous accompagnera (sans surcoût).</p><div class="prac-pick" id="pracs"></div></section>' +
+            '<section data-reveal><h2>Ils l’ont testé</h2><div class="reviews">' + T.reviews.map(function (r) { return '<div class="review"><div class="r-head"><span class="avatar">' + S.esc(r.who[0]) + '</span><div><div class="r-who">' + S.esc(r.who) + '</div><div class="r-meta">' + S.esc(r.date) + '</div></div><span style="margin-left:auto">' + S.stars(r.rating) + '</span></div><p class="r-txt">' + S.esc(r.text) + '</p></div>'; }).join('') + '</div></section>' +
+            '<section data-reveal><h2>Vous aimerez aussi</h2><div class="cards">' + D.treatments.filter(function (t) { return t.id !== T.id; }).slice(0, 3).map(function (t) { return '<a class="card" href="spa-soin.html?id=' + t.id + '"><div class="c-photo"><img src="' + t.photos[0][0] + '" alt="" loading="lazy"></div><div class="c-body"><h3>' + S.esc(t.name) + '</h3><div class="c-meta">⏱ ' + t.duration + ' min</div><div class="c-foot"><div class="c-price">' + S.euros(t.price) + '</div><span class="c-go">Voir</span></div></div></a>'; }).join('') + '</div></section>' +
+          '</div>' +
+          '<aside class="book-card" id="book"></aside>' +
+        '</div>';
+
+      S.gallery('#gallery', photos);
+      function renderPracs() {
+        document.getElementById('pracs').innerHTML = T.practitioners.map(function (pid) { var p = P[pid]; return '<div class="person pick ' + (st.prac === pid ? 'sel' : '') + '" data-p="' + pid + '"><img src="' + p.photo + '" alt=""><div><div class="p-name">' + S.esc(p.name) + '</div><div class="p-role">' + S.esc(p.role) + '</div><div class="p-bio">' + S.esc(p.bio) + '</div></div></div>'; }).join('');
+        document.querySelectorAll('#pracs .person').forEach(function (el) { el.onclick = function () { st.prac = el.getAttribute('data-p'); renderPracs(); renderBook(); }; });
+      }
+      renderPracs();
+
+      function slotsFor(day) { var seed = day.split('-').join('') % 97; return D.slots.map(function (s, i) { return { t: s, off: S.rand(seed + i * 7 + T.id.length) < 0.3 }; }); }
+      function renderBook() {
+        var box = document.getElementById('book');
+        var days = []; for (var i = 0; i < 10; i++) days.push(S.today(1 + i));
+        var slots = slotsFor(st.day);
+        if (st.time && slots.filter(function (s) { return s.t === st.time && !s.off; }).length === 0) st.time = null;
+        var deposit = Math.round(T.price * 0.5 / 100) * 100;
+        box.innerHTML =
+          '<div class="bc-price"><b>' + S.euros(T.price) + '</b><span>· ' + T.duration + ' min</span></div>' +
+          '<div class="bc-rating">' + S.stars(T.rating) + '<span>' + T.rating.toFixed(1) + ' (' + T.reviewsCount + ')</span></div>' +
+          '<div class="hint" style="margin-bottom:6px" id="reserver">Choisissez un jour</div><div class="slot-day">' + days.map(function (d) { var dt = new Date(d + 'T12:00:00'); return '<button type="button" data-d="' + d + '" class="' + (d === st.day ? 'on' : '') + '"><span>' + dt.toLocaleDateString('fr-FR', { weekday: 'short' }) + '</span><b>' + dt.getDate() + '</b><span>' + dt.toLocaleDateString('fr-FR', { month: 'short' }) + '</span></button>'; }).join('') + '</div>' +
+          '<div class="hint" style="margin-top:8px">Créneaux du ' + S.fmtDate(st.day) + '</div><div class="slot-time">' + slots.map(function (s) { return '<button type="button" data-t="' + s.t + '" class="' + (s.off ? 'off' : (s.t === st.time ? 'on' : '')) + '" ' + (s.off ? 'disabled' : '') + '>' + s.t + '</button>'; }).join('') + '</div>' +
+          '<div class="bc-row" style="margin-top:10px"><span class="lab">Praticien(ne)</span><span class="val">' + S.esc(P[st.prac].name) + '</span></div>' +
+          '<div class="bc-row"><span class="lab">Créneau</span><span class="val">' + (st.time ? S.fmtDate(st.day) + ' · ' + st.time : '—') + '</span></div>' +
+          '<label class="gift-toggle"><input type="checkbox" id="gift" ' + (st.gift ? 'checked' : '') + '> 🎁 C’est pour offrir (bon cadeau, créneau à choisir par le bénéficiaire)</label>' +
+          '<div class="bc-total"><span>Total<small>' + (st.gift ? 'Bon cadeau envoyé par e-mail' : 'Capture immédiate, soin réglé') + '</small></span><span>' + S.euros(T.price) + '</span></div>' +
+          '<div class="actions">' +
+            '<button class="btn" id="pay-now" ' + (!st.gift && !st.time ? 'disabled' : '') + '>' + (st.gift ? 'Offrir ce soin — ' + S.euros(T.price) : 'Réserver & régler — ' + S.euros(T.price)) + '</button>' +
+            (T.premium && !st.gift ? '<button class="btn accent" id="pay-hold" ' + (!st.time ? 'disabled' : '') + '>Garantir le créneau — empreinte ' + S.euros(deposit) + '</button>' : '') +
+            '<button class="btn ghost" data-add data-id="' + T.id + '" data-name="' + S.esc(T.name) + '" data-price="' + T.price + '" data-img="' + T.photos[0][0] + '">+ Ajouter au panier</button>' +
+          '</div>' +
+          '<div class="how">' + (T.premium ? '<b>Créneau premium.</b> Payez maintenant, ou garantissez-le par une <b>empreinte de ' + S.euros(deposit) + '</b> (pré-autorisation) : rien n’est débité si vous venez, elle est capturée en cas de no-show.' : '<b>Paiement en ligne.</b> Le soin est réglé maintenant et le créneau est bloqué dans Nymphea. Annulation gratuite jusqu’à 24 h avant.') + '</div>' +
+          '<div class="pbs-slot" data-pbs="compact"></div>';
+        S.brand();
+        box.querySelectorAll('.slot-day button').forEach(function (b) { b.onclick = function () { st.day = b.getAttribute('data-d'); renderBook(); }; });
+        box.querySelectorAll('.slot-time button:not(.off)').forEach(function (b) { b.onclick = function () { st.time = b.getAttribute('data-t'); renderBook(); }; });
+        document.getElementById('gift').onchange = function () { st.gift = this.checked; renderBook(); };
+        var base = [['Soin', T.name + ' (' + T.duration + ' min)'], ['Praticien(ne)', P[st.prac].name]];
+        var pre = { treatment: T.name, slot: st.day, time: st.time || '', practitioner: P[st.prac].name, gift: st.gift ? 'Bon cadeau (offrir)' : 'Pour moi' };
+        document.getElementById('pay-now').onclick = function () {
+          var sum = st.gift ? base.concat([['Format', 'Bon cadeau · validité 12 mois'], ['Envoi', 'E-mail au bénéficiaire']]) : base.concat([['Créneau', S.fmtDate(st.day, true) + ' à ' + st.time]]);
+          PMS.checkout({ mode: 'immediate', amount: T.price, itemLabel: (st.gift ? 'Bon cadeau — ' : 'Soin — ') + T.name, summary: sum, prefill: pre });
+        };
+        var hold = document.getElementById('pay-hold');
+        if (hold) hold.onclick = function () { PMS.checkout({ mode: 'caution', amount: deposit, itemLabel: 'Caution no-show — ' + T.name, summary: base.concat([['Créneau', S.fmtDate(st.day, true) + ' à ' + st.time], ['Empreinte', S.euros(deposit) + ' (non débitée)'], ['Reste à régler sur place', S.euros(T.price)]]), prefill: pre }); };
+      }
+      renderBook();
+      S.reveal();
+      if (location.hash === '#reserver') setTimeout(function () { var el = document.getElementById('reserver'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 300);
+    })();
+  </script>
+</body>
+</html>

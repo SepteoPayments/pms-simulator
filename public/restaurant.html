@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Brasserie du Vieux-Port — Marseille · La carte, réserver une table, l'addition</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&family=Karla:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="styles.css" /><link rel="stylesheet" href="ui.css" /><link rel="stylesheet" href="skins.css" />
+<link rel="stylesheet" href="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.68.0/adyen.css" />
+<script src="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.68.0/adyen.js"></script>
+<style>
+  .r-hero { min-height: 76vh; display: flex; align-items: center; }
+  .r-hero .inner { padding: 80px 0; }
+  .r-hero h1 { font-size: clamp(38px, 6vw, 72px); max-width: 15ch; line-height: 1.02; }
+  .r-hero .ornament { color: var(--accent); font-size: 22px; letter-spacing: 8px; margin-bottom: 8px; }
+  .hours { display: inline-flex; gap: 14px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.25); border-radius: 8px; padding: 8px 14px; font-size: 13px; margin-top: 18px; flex-wrap: wrap; }
+  .chef { display: grid; grid-template-columns: 200px 1fr; gap: 22px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 22px 26px; }
+  .chef img { width: 200px; height: 200px; border-radius: 50%; object-fit: cover; border: 6px solid #f0e4d2; }
+  .chef h3 { margin: 0 0 4px; font-size: 26px; }
+  .chef .role { color: var(--accent-ink); font-weight: 700; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; }
+  .chef p { color: var(--muted); font-size: 15px; line-height: 1.6; font-style: italic; font-family: var(--font-head); }
+  @media (max-width: 700px) { .chef { grid-template-columns: 1fr; text-align: center; } .chef img { margin: 0 auto; } }
+  .resa-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 22px; align-items: start; }
+  @media (max-width: 900px) { .resa-grid { grid-template-columns: 1fr; } }
+  .svc-switch { display: inline-flex; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 4px; margin-bottom: 12px; }
+  .svc-switch button { border: none; background: transparent; font: inherit; font-weight: 700; padding: 8px 18px; border-radius: 999px; cursor: pointer; color: var(--muted); }
+  .svc-switch button.on { background: var(--brand); color: #fff; }
+  .resa-card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 20px 22px; position: sticky; top: 84px; }
+  .resa-card h3 { margin: 0 0 10px; font-size: 22px; }
+  .bill { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 22px 26px; font-family: ui-monospace, Consolas, monospace; font-size: 13.5px; position: relative; }
+  .bill::before, .bill::after { content: ''; position: absolute; left: 0; right: 0; height: 10px; background: radial-gradient(circle at 5px -3px, transparent 6px, var(--surface) 6px) repeat-x; background-size: 12px 10px; }
+  .bill::before { top: -8px; } .bill::after { bottom: -8px; transform: scaleY(-1); }
+  .bill .b-head { text-align: center; font-family: var(--font-head); font-size: 20px; margin-bottom: 4px; }
+  .bill .b-meta { text-align: center; color: var(--muted); font-size: 12px; margin-bottom: 14px; }
+  .bill .b-line { display: flex; justify-content: space-between; gap: 10px; padding: 4px 0; }
+  .bill .b-line span:first-child { flex: 1; }
+  .bill .b-line.tot { border-top: 1px dashed var(--line); margin-top: 8px; padding-top: 10px; font-weight: 700; font-size: 16px; }
+  .bill .b-line.sub { color: var(--muted); }
+  .split { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .split button { border: 1px solid var(--line); background: var(--bg); border-radius: 8px; padding: 8px 12px; font: inherit; font-size: 13px; cursor: pointer; font-weight: 700; }
+  .split button.on { background: var(--brand); color: #fff; border-color: var(--brand); }
+  .tip { display: flex; gap: 6px; margin-top: 10px; }
+  .tip button { flex: 1; border: 1px solid var(--line); background: var(--bg); border-radius: 8px; padding: 7px; font: inherit; font-size: 12.5px; cursor: pointer; }
+  .tip button.on { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 700; }
+  .pos-box { background: linear-gradient(135deg, #5e2323, #8a3b2e); color: #fff; border-radius: 18px; padding: 22px 26px; display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; }
+  .pos-box b { font-family: var(--font-head); font-size: 20px; display: block; }
+  .pos-box span { font-size: 13.5px; opacity: .85; }
+  @media (max-width: 700px) { .pos-box { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body class="theme-resto" data-theme-key="resto">
+  <header class="topbar dark">
+    <div class="wrap">
+      <a class="brand" href="restaurant.html"><span class="dot">B</span><span>Brasserie du Vieux-Port<small>Marseille · POS Ulyses by Septeo</small></span></a>
+      <nav class="nav">
+        <a href="#carte">La carte</a>
+        <a href="#reserver">Réserver</a>
+        <a href="#addition">L’addition</a>
+        <button class="cartbtn" id="open-cart">🧾 Addition <span class="count" id="cart-count">0</span></button>
+        <a class="cta" href="operations.html">Console</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero r-hero">
+    <div class="bg" style="background-image:url('img/resto-hero.jpg')"></div>
+    <div class="scrim"></div>
+    <div class="wrap inner">
+      <div class="ornament">✦ ✦ ✦</div>
+      <span class="eyebrow" style="color:#f0d3a8">Brasserie · Quai du Port · Marseille · depuis 1954</span>
+      <h1>La mer dans l’assiette, le port à vos pieds</h1>
+      <p>Bouillabaisse à la charte, poissons du quai, panisses maison. Composez votre addition depuis la carte et <strong>réglez-la en salle</strong> sur votre téléphone ; pour les grandes tables, une <strong>empreinte de garantie</strong> à la réservation. Le POS Ulyses et Payments by Septeo s’occupent du reste.</p>
+      <div class="hours"><span>🕛 Midi 12h – 14h30</span><span>🌙 Soir 19h – 22h30</span><span>🚫 Fermé le lundi</span></div>
+    </div>
+  </section>
+
+  <main class="wrap">
+    <nav class="cat-nav" id="cat-nav"><div class="wrap-in"></div></nav>
+
+    <section class="section" id="carte" style="padding-top:26px">
+      <div class="sec-head"><div><span class="eyebrow">La carte</span><h2>Ce qui sort de la cuisine aujourd’hui</h2><p class="lead">Cliquez sur un plat pour son histoire, ses allergènes, son accord vin. Ajoutez à l’addition, réglez en une fois.</p></div><span class="badge soft">Pêche du jour · <span id="today"></span></span></div>
+      <div id="menu"></div>
+    </section>
+
+    <section class="section" id="chef-sec">
+      <div class="chef" data-reveal>
+        <img src="img/rst-chef.jpg" alt="">
+        <div><span class="role">En cuisine</span><h3>Chef Antoine Ferrandi</h3><p>« Marseillais pur jus, je cuisine le poisson du jour acheté sur le quai à 6 h. La bouillabaisse à la charte, les panisses maison, la tropézienne de ma grand-mère. Le reste, c’est du bavardage. »</p><div class="chips"><span class="chip-t">Charte de la bouillabaisse</span><span class="chip-t">Pêche locale</span><span class="chip-t">Fait maison</span></div></div>
+      </div>
+    </section>
+
+    <section class="section" id="reserver">
+      <div class="sec-head"><div><span class="eyebrow">Réserver une table</span><h2>Choisissez votre place</h2><p class="lead">Plan de salle en temps réel. À partir de 8 couverts, une <strong>empreinte de 500 €</strong> est pré-autorisée (jamais débitée si vous venez).</p></div></div>
+      <div class="resa-grid">
+        <div>
+          <div class="svc-switch" id="svc"><button data-s="midi" class="on">☀️ Midi</button><button data-s="soir">🌙 Soir</button></div>
+          <div class="seatplan" id="seatplan"></div>
+        </div>
+        <div class="resa-card" id="resa"></div>
+      </div>
+    </section>
+
+    <section class="section" id="addition">
+      <div class="sec-head"><div><span class="eyebrow">L’addition</span><h2>Régler sans attendre</h2><p class="lead">Exemple d’addition d’une table de 4 : réglez-la en une fois, ou partagez-la. Un QR code sur le ticket ouvre exactement ce parcours.</p></div></div>
+      <div class="grid-2" style="align-items:start">
+        <div class="bill" data-reveal>
+          <div class="b-head">Brasserie du Vieux-Port</div>
+          <div class="b-meta">Table T4 · 4 couverts · service du soir · serveur : Malik<br>Ticket n° 2609-0142</div>
+          <div id="bill-lines"></div>
+          <div class="split" id="split"><span class="hint" style="align-self:center">Partager :</span><button data-n="1" class="on">Tout</button><button data-n="2">÷ 2</button><button data-n="3">÷ 3</button><button data-n="4">÷ 4</button></div>
+          <div class="hint" style="margin-top:10px">Pourboire</div><div class="tip" id="tip"><button data-t="0" class="on">Aucun</button><button data-t="5">5 %</button><button data-t="10">10 %</button><button data-t="15">15 %</button></div>
+          <button class="btn accent block" id="pay-bill" style="margin-top:14px"></button>
+        </div>
+        <div style="display:grid;gap:16px">
+          <div class="pos-box" data-reveal><div><b>Payer au terminal en salle</b><span>Le serveur envoie le montant sur le TPE (Adyen Terminal API) depuis le POS Ulyses. Nécessite un terminal enregistré : en démo, l’appel est réel mais renvoie 501.</span></div><button class="btn" data-pay="immediate" data-pos="1" style="background:#fff;color:var(--brand)">💳 Payer au TPE</button></div>
+          <div class="panel-lt" data-reveal style="--i:1"><h3>Ils sont passés à table</h3><div class="reviews" style="grid-template-columns:1fr" id="reviews"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="dt-band" data-reveal>
+        <div>
+          <span class="eyebrow" style="color:#f0d3a8">Data travel</span>
+          <h2>Chaque addition raconte le service</h2>
+          <p>Service (midi/soir), nombre de couverts, table, occasion, allergies déclarées : le POS Ulyses transmet le contexte avec le paiement. On en tire le ticket moyen par service, le taux de no-show des grandes tables, la part des additions partagées.</p>
+          <div data-pbs></div>
+        </div>
+        <div class="dt-json" id="dt-json"></div>
+      </div>
+    </section>
+
+    <section class="section"><p class="note">Démo sandbox — carte de test <strong>4111 1111 1111 1111</strong> · 03/30 · 737. Capture ou libération de l’empreinte groupe dans la <a href="operations.html">console d'opérations</a>.</p></section>
+  </main>
+
+  <footer class="footer"><div class="wrap"><span>Brasserie du Vieux-Port · 32 quai du Port, Marseille · démo sandbox</span><span>POS Ulyses · Asterio — Septeo Hospitality</span></div></footer>
+
+  <script src="themes.js"></script>
+  <script src="theme-switcher.js"></script>
+  <script src="common.js"></script>
+  <script src="checkout.js"></script>
+  <script src="site.js"></script>
+  <script src="data/resto.js"></script>
+  <script>
+    (function () {
+      var D = window.DATA_RST, S = window.SITE;
+      document.getElementById('today').textContent = S.fmtDate(S.today(0));
+      // carte
+      document.querySelector('#cat-nav .wrap-in').innerHTML = D.categories.map(function (c) { return '<a href="#cat-' + c.id + '">' + c.name + '</a>'; }).join('') + '<a href="#reserver">Réserver</a><a href="#addition">Addition</a>';
+      document.getElementById('menu').innerHTML = D.categories.map(function (c) {
+        return '<div class="menu-cat" id="cat-' + c.id + '"><h2>' + S.esc(c.name) + '<small>' + S.esc(c.sub) + '</small></h2><div class="menu-list">' + D.dishes.filter(function (d) { return d.cat === c.id; }).map(function (d, i) {
+          return '<div class="menu-item" data-reveal style="--i:' + (i % 3) + '"><a href="restaurant-plat.html?id=' + d.id + '"><img src="' + d.img + '" alt="' + S.esc(d.name) + '" loading="lazy"></a><div><div class="mi-line"><a class="mi-name" href="restaurant-plat.html?id=' + d.id + '" style="text-decoration:none">' + S.esc(d.name) + '</a><span class="mi-dots"></span><span class="mi-price">' + S.euros(d.price) + '</span></div><div class="mi-desc">' + S.esc(d.desc) + '</div><div class="mi-tags">' + (d.popular ? '<span>★ Populaire</span>' : '') + d.tags.slice(0, 2).map(function (t) { return '<span>' + S.esc(t) + '</span>'; }).join('') + '</div><div class="mi-add"><button class="btn sm ghost" data-add data-id="' + d.id + '" data-name="' + S.esc(d.name) + '" data-price="' + d.price + '" data-img="' + d.img + '">+ Ajouter à l’addition</button></div></div></div>';
+        }).join('') + '</div></div>';
+      }).join('');
+      // scroll spy
+      var links = document.querySelectorAll('#cat-nav a');
+      window.addEventListener('scroll', function () { var y = window.scrollY + 140, cur = null; document.querySelectorAll('.menu-cat, #reserver, #addition').forEach(function (s) { if (s.offsetTop <= y) cur = s.id; }); links.forEach(function (a) { a.classList.toggle('on', a.getAttribute('href') === '#' + cur); }); }, { passive: true });
+
+      // plan de salle
+      var st = { svc: 'midi', table: null, covers: 2, date: S.today(1), time: '12h30' };
+      function busySet() { var b = {}; D.room.forEach(function (z) { z.tables.forEach(function (t) { if (S.rand(t[0].charCodeAt(1) * 3 + (st.svc === 'midi' ? 1 : 7) + st.date.length) < (st.svc === 'midi' ? 0.35 : 0.55)) b[t[0]] = 1; }); }); return b; }
+      function drawPlan() {
+        var busy = busySet();
+        document.getElementById('seatplan').innerHTML = '<div class="sp-grid">' + D.room.map(function (z) { return '<div class="zone">' + S.esc(z.zone) + '</div>' + z.tables.map(function (t) { var isBusy = busy[t[0]], tooSmall = t[1] < st.covers; return '<div class="tbl ' + (t[2] === 'round' ? 'round' : '') + (isBusy ? ' busy' : '') + (st.table === t[0] ? ' sel' : '') + '" data-t="' + t[0] + '" data-c="' + t[1] + '" title="' + (isBusy ? 'Occupée' : tooSmall ? 'Trop petite pour ' + st.covers : 'Disponible') + '" style="' + (tooSmall && !isBusy ? 'opacity:.45' : '') + '"><b>' + t[0] + '</b><span class="cap">' + t[1] + ' pl.</span></div>'; }).join(''); }).join('') + '</div>';
+        document.querySelectorAll('.tbl:not(.busy)').forEach(function (el) { el.onclick = function () { st.table = el.getAttribute('data-t'); var cap = Number(el.getAttribute('data-c')); if (st.covers > cap) st.covers = cap; drawPlan(); renderResa(); }; });
+      }
+      function renderResa() {
+        var box = document.getElementById('resa'), big = st.covers >= D.resto.groupMin;
+        var times = st.svc === 'midi' ? ['12h00', '12h30', '13h00', '13h30'] : ['19h30', '20h00', '20h30', '21h00'];
+        if (times.indexOf(st.time) < 0) st.time = times[0];
+        var tbl = null; D.room.forEach(function (z) { z.tables.forEach(function (t) { if (t[0] === st.table) tbl = { id: t[0], cap: t[1], zone: z.zone }; }); });
+        box.innerHTML = '<h3>Votre table</h3>' +
+          '<div class="field-row"><label>Date<input type="date" id="r-date" value="' + st.date + '" min="' + S.today(0) + '"></label><label>Heure<select id="r-time">' + times.map(function (t) { return '<option ' + (t === st.time ? 'selected' : '') + '>' + t + '</option>'; }).join('') + '</select></label></div>' +
+          '<div class="bc-row"><span class="lab">Couverts</span><div class="stepper"><button type="button" id="c-minus">−</button><span>' + st.covers + '</span><button type="button" id="c-plus">+</button></div></div>' +
+          '<div class="bc-row"><span class="lab">Table</span><span class="val">' + (tbl ? tbl.id + ' · ' + tbl.cap + ' places · ' + tbl.zone.split(' · ')[0] : 'Choisissez sur le plan') + '</span></div>' +
+          '<div class="bc-row"><span class="lab">Service</span><span class="val">' + (st.svc === 'midi' ? 'Midi' : 'Soir') + ' · ' + S.fmtDate(st.date) + ' · ' + st.time + '</span></div>' +
+          (big ? '<div class="bc-total"><span>Empreinte de garantie<small>Groupe de ' + st.covers + ' · pré-autorisée, non débitée</small></span><span>' + S.euros(D.resto.groupDeposit) + '</span></div>' : '<div class="how" style="margin-top:10px">Réservation gratuite jusqu’à 7 couverts. À partir de 8, une empreinte de ' + S.euros(D.resto.groupDeposit) + ' garantit la table.</div>') +
+          '<div class="actions">' + (big ? '<button class="btn accent" id="r-go" ' + (tbl ? '' : 'disabled') + '>Garantir la table — empreinte ' + S.euros(D.resto.groupDeposit) + '</button>' : '<button class="btn" id="r-go" ' + (tbl ? '' : 'disabled') + '>Réserver la table' + (tbl ? ' ' + tbl.id : '') + '</button>') + '</div>' +
+          '<div class="pbs-slot" data-pbs="compact"></div>';
+        S.brand();
+        document.getElementById('r-date').onchange = function () { st.date = this.value; drawPlan(); renderResa(); };
+        document.getElementById('r-time').onchange = function () { st.time = this.value; };
+        document.getElementById('c-minus').onclick = function () { st.covers = Math.max(1, st.covers - 1); drawPlan(); renderResa(); };
+        document.getElementById('c-plus').onclick = function () { st.covers = Math.min(12, st.covers + 1); if (tbl && st.covers > tbl.cap) st.table = null; drawPlan(); renderResa(); };
+        document.getElementById('r-go').onclick = function () {
+          var pre = { date: st.date, service: st.svc === 'midi' ? 'Midi' : 'Soir', time: st.time, covers: String(st.covers), table: tbl ? tbl.id + ' · ' + tbl.zone.split(' · ')[0] : '' };
+          if (big) PMS.checkout({ mode: 'caution', amount: D.resto.groupDeposit, itemLabel: 'Empreinte réservation groupe — table ' + tbl.id + ' (' + st.covers + ' couverts)', summary: [['Table', tbl.id + ' · ' + tbl.zone], ['Service', pre.service + ' · ' + S.fmtDate(st.date, true) + ' · ' + st.time], ['Couverts', String(st.covers)], ['Empreinte', S.euros(D.resto.groupDeposit) + ' (débitée seulement en cas de no-show)']], prefill: pre });
+          else { S.toast('Table ' + tbl.id + ' réservée pour ' + st.covers + ' le ' + S.fmtDate(st.date) + ' à ' + st.time + ' (démo, sans paiement).', 'ok'); }
+        };
+      }
+      document.querySelectorAll('#svc button').forEach(function (b) { b.onclick = function () { st.svc = b.getAttribute('data-s'); document.querySelectorAll('#svc button').forEach(function (x) { x.classList.toggle('on', x === b); }); st.table = null; drawPlan(); renderResa(); }; });
+      drawPlan(); renderResa();
+
+      // addition exemple
+      var BILL = [['huitres', 1], ['panisse', 1], ['bouilla', 2], ['entrecote', 1], ['linguine', 1], ['rose', 1], ['eau', 1], ['tropez', 2], ['cafe', 2]];
+      var split = 1, tip = 0;
+      function renderBill() {
+        var lines = BILL.map(function (b) { var d = D.dishes.filter(function (x) { return x.id === b[0]; })[0]; return { name: d.name, qty: b[1], amt: d.price * b[1] }; });
+        var total = lines.reduce(function (s, l) { return s + l.amt; }, 0), tipAmt = Math.round(total * tip / 100), grand = total + tipAmt, part = Math.round(grand / split);
+        document.getElementById('bill-lines').innerHTML = lines.map(function (l) { return '<div class="b-line"><span>' + l.qty + ' × ' + S.esc(l.name) + '</span><span>' + S.euros(l.amt) + '</span></div>'; }).join('') +
+          '<div class="b-line sub"><span>Sous-total</span><span>' + S.euros(total) + '</span></div>' + (tip ? '<div class="b-line sub"><span>Pourboire ' + tip + ' %</span><span>' + S.euros(tipAmt) + '</span></div>' : '') +
+          '<div class="b-line tot"><span>Total' + (split > 1 ? ' · votre part (1/' + split + ')' : '') + '</span><span>' + S.euros(split > 1 ? part : grand) + '</span></div>';
+        document.getElementById('pay-bill').textContent = (split > 1 ? 'Régler ma part — ' : 'Régler l’addition — ') + S.euros(split > 1 ? part : grand);
+        document.getElementById('pay-bill').onclick = function () { PMS.checkout({ mode: 'immediate', amount: split > 1 ? part : grand, itemLabel: (split > 1 ? 'Part d’addition (1/' + split + ') — ' : 'Addition — ') + 'Table T4 · ticket 2609-0142', summary: lines.map(function (l) { return [l.qty + ' × ' + l.name, S.euros(l.amt)]; }).concat(tip ? [['Pourboire ' + tip + ' %', S.euros(tipAmt)]] : [], split > 1 ? [['Total table', S.euros(grand)], ['Votre part', '1/' + split]] : []), prefill: { covers: '4', service: 'Soir', table: 'T4 · Terrasse', date: S.today(0), time: '20h30' } }); };
+      }
+      document.querySelectorAll('#split button').forEach(function (b) { b.onclick = function () { split = Number(b.getAttribute('data-n')); document.querySelectorAll('#split button').forEach(function (x) { x.classList.toggle('on', x === b); }); renderBill(); }; });
+      document.querySelectorAll('#tip button').forEach(function (b) { b.onclick = function () { tip = Number(b.getAttribute('data-t')); document.querySelectorAll('#tip button').forEach(function (x) { x.classList.toggle('on', x === b); }); renderBill(); }; });
+      renderBill();
+      document.getElementById('reviews').innerHTML = D.reviews.map(function (r) { return '<div class="review"><div class="r-head"><span class="avatar">' + S.esc(r.who[0]) + '</span><div><div class="r-who">' + S.esc(r.who) + '</div><div class="r-meta">' + S.esc(r.date) + '</div></div><span style="margin-left:auto">' + S.stars(r.rating) + '</span></div><p class="r-txt">' + S.esc(r.text) + '</p></div>'; }).join('');
+      var j = { shopper: { firstName: 'Juliette', lastName: 'Moreau', email: 'juliette.moreau@example.fr' }, metadata: { vertical: 'resto', date: S.today(0), service: 'Soir', time: '20h30', covers: 4, table: 'T4 · Terrasse', occasion: 'Anniversaire', allergies: 'Fruits à coque', split: '1/2', tip: '10 %' } };
+      document.getElementById('dt-json').innerHTML = JSON.stringify(j, null, 2).replace(/"([^"]+)":/g, '<span class="k">"$1"</span>:').replace(/: "([^"]*)"/g, ': <span class="s">"$1"</span>').replace(/: (\d+)/g, ': <span class="n">$1</span>');
+      S.reveal();
+    })();
+  </script>
+</body>
+</html>

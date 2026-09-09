@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Camping Les Flots Bleus ★★★★ — Mimizan · Mobil-homes, cottages, lodges & emplacements</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="styles.css" /><link rel="stylesheet" href="ui.css" /><link rel="stylesheet" href="skins.css" />
+<link rel="stylesheet" href="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.68.0/adyen.css" />
+<script src="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.68.0/adyen.js"></script>
+<style>
+  .c-hero { min-height: 78vh; display: flex; align-items: center; }
+  .c-hero .inner { padding: 70px 0 110px; }
+  .c-hero h1 { font-size: clamp(38px, 6vw, 70px); font-weight: 700; max-width: 16ch; line-height: 1.02; }
+  .c-hero .sun { position: absolute; right: 8%; top: 12%; width: 120px; height: 120px; border-radius: 50%; background: radial-gradient(circle, #ffd66b, #f08a2e); box-shadow: 0 0 80px 30px rgba(240,138,46,.35); animation: sunPulse 6s ease-in-out infinite; opacity: .9; }
+  @keyframes sunPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+  .searchbar { position: relative; z-index: 3; margin: -60px auto 0; max-width: 1040px; background: var(--surface); border-radius: 26px; box-shadow: 0 24px 60px rgba(44,90,58,.2); display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; padding: 10px; gap: 8px; border: 2px solid var(--line); }
+  .searchbar label { display: flex; flex-direction: column; gap: 2px; padding: 10px 16px; border-radius: 18px; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 800; }
+  .searchbar label:hover { background: var(--bg); }
+  .searchbar input, .searchbar select { border: none; font: inherit; font-size: 15px; color: var(--ink); background: transparent; padding: 0; outline: none; font-weight: 700; }
+  .searchbar button { border: none; background: var(--accent); color: #fff; font: inherit; font-weight: 800; font-size: 15px; padding: 0 26px; border-radius: 18px; cursor: pointer; }
+  @media (max-width: 900px) { .searchbar { grid-template-columns: 1fr 1fr; margin-top: -30px; } .searchbar button { grid-column: 1 / -1; padding: 14px; } }
+  .stay-card .c-photo { aspect-ratio: 4/3; }
+  .stay-card .c-specs { display: flex; gap: 10px; font-size: 12.5px; color: var(--muted); flex-wrap: wrap; }
+  .stay-card .c-specs span::before { content: attr(data-ico); margin-right: 4px; }
+  .stay-card .zone { font-size: 12px; color: var(--brand-2); font-weight: 700; }
+  /* plan du camping */
+  .plan { background: linear-gradient(180deg, #eef5e6, #e3eedb); border: 2px solid var(--line); border-radius: 26px; padding: 14px; position: relative; }
+  .plan svg { width: 100%; height: auto; display: block; border-radius: 18px; }
+  .plan .zone-rect { opacity: .55; rx: 14; }
+  .plan .zone-lab { font-family: var(--font-head); font-weight: 700; font-size: 16px; fill: #2c5a3a; }
+  .plan .pitch { fill: #fff; stroke: #b7cbb0; stroke-width: 1; rx: 3; cursor: pointer; transition: fill .15s; }
+  .plan .pitch:hover { fill: #ffe6c9; stroke: var(--accent); }
+  .plan .pitch.busy { fill: #d9d9d9; cursor: not-allowed; stroke: #ccc; }
+  .plan .pitch.sel { fill: var(--accent); stroke: #8a4c12; }
+  .plan .pitch-n { font-size: 5.5px; fill: #2c5a3a; pointer-events: none; font-weight: 700; font-family: var(--font-body); }
+  .plan .poi { font-size: 12px; }
+  .plan .poi-lab { font-size: 6.5px; fill: #2c5a3a; font-weight: 700; font-family: var(--font-body); }
+  .plan .road { stroke: #f5f0e6; stroke-width: 6; stroke-linecap: round; fill: none; }
+  .plan-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12.5px; color: var(--muted); margin-top: 10px; }
+  .plan-legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; vertical-align: -2px; margin-right: 5px; border: 1px solid #b7cbb0; background: #fff; }
+  .plan-legend i.b { background: #d9d9d9; } .plan-legend i.s { background: var(--accent); }
+  .pitch-info { background: var(--surface); border: 2px solid var(--line); border-radius: 22px; padding: 18px 20px; }
+  .pitch-info h3 { margin: 0 0 6px; font-size: 22px; }
+  .act-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+  .act { background: var(--surface); border: 2px solid var(--line); border-radius: 22px; overflow: hidden; display: flex; flex-direction: column; transition: transform .15s, border-color .15s; }
+  .act:hover { transform: translateY(-4px); border-color: var(--accent); }
+  .act img { width: 100%; aspect-ratio: 16/10; object-fit: cover; }
+  .act .a-b { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .act .a-b b { font-family: var(--font-head); font-size: 17px; display: flex; align-items: center; gap: 6px; }
+  .act .a-b p { margin: 0; font-size: 12.5px; color: var(--muted); flex: 1; line-height: 1.45; }
+  .act .a-f { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; }
+  .act .a-f .p { font-weight: 800; color: var(--brand); }
+  .act .a-f .p small { font-weight: 600; color: var(--muted); font-size: 11.5px; }
+  .act .a-cat { position: absolute; }
+  .act-filter { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+  .act-filter button { border: 2px solid var(--line); background: var(--surface); border-radius: 999px; padding: 7px 14px; font: inherit; font-weight: 700; font-size: 13px; color: var(--muted); cursor: pointer; }
+  .act-filter button.on { background: var(--brand-2); color: #fff; border-color: var(--brand-2); }
+  .split-pay { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .split-pay .sp { background: var(--surface); border: 2px dashed var(--line); border-radius: 22px; padding: 22px; text-align: center; position: relative; }
+  .split-pay .sp .pct { font-family: var(--font-head); font-size: 44px; font-weight: 700; color: var(--accent); line-height: 1; }
+  .split-pay .sp b { display: block; font-family: var(--font-head); font-size: 18px; margin: 8px 0 4px; }
+  .split-pay .sp span { font-size: 13px; color: var(--muted); }
+  .split-pay .sp .when { display: inline-block; margin-top: 10px; background: #e8f0e4; color: var(--brand); font-weight: 800; font-size: 11.5px; padding: 4px 10px; border-radius: 999px; }
+  @media (max-width: 800px) { .split-pay { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body class="theme-camping" data-theme-key="camping">
+  <header class="topbar">
+    <div class="wrap">
+      <a class="brand" href="camping.html"><span class="dot">⛺</span><span>Les Flots Bleus<small>Mimizan · ★★★★ · eSeason by Septeo</small></span></a>
+      <nav class="nav">
+        <a href="#hebergements">Hébergements</a>
+        <a href="#plan">Plan</a>
+        <a href="#activites">Activités</a>
+        <button class="cartbtn" id="open-cart">🎟️ Activités <span class="count" id="cart-count">0</span></button>
+        <a class="cta" href="operations.html">Console</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero c-hero">
+    <div class="bg" style="background-image:url('img/camping-hero.jpg')"></div>
+    <div class="scrim"></div>
+    <div class="sun" aria-hidden="true"></div>
+    <div class="wrap inner">
+      <span class="eyebrow" style="color:#d7ecc9">Camping 4 étoiles · Mimizan-Plage · Landes</span>
+      <h1>L’océan, les pins, et rien d’autre à penser</h1>
+      <p>Mobil-homes, cottages en bois, lodges toile et emplacements sous les pins, à 300 m de la plage. <strong>Acompte de 30 %</strong> à la réservation, <strong>solde à J-30</strong>, et les <strong>activités</strong> à la carte. eSeason orchestre, Payments by Septeo encaisse.</p>
+      <div class="pills"><span class="pill">Acompte 30 %</span><span class="pill">Solde avant l’arrivée</span><span class="pill">Espace aquatique inclus</span><span class="pill">Plage à 300 m</span></div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <form class="searchbar" id="search">
+      <label>Arrivée<input type="date" id="s-in"></label>
+      <label>Nuits<select id="s-nights"><option value="2">2 nuits</option><option value="3">3 nuits</option><option value="7" selected>7 nuits</option><option value="14">14 nuits</option></select></label>
+      <label>Adultes<select id="s-adults"><option>1</option><option selected>2</option><option>3</option><option>4</option></select></label>
+      <label>Enfants<select id="s-kids"><option>0</option><option>1</option><option selected>2</option><option>3</option><option>4</option></select></label>
+      <button type="submit">C’est parti !</button>
+    </form>
+  </div>
+
+  <main class="wrap">
+    <section class="section" id="hebergements">
+      <div class="sec-head"><div><span class="eyebrow">Nos hébergements</span><h2>Choisissez votre nid sous les pins</h2><p class="lead">Prix pour vos dates, taxe de séjour incluse. Cliquez pour voir la fiche : photos, équipements, emplacement sur le plan, options et disponibilités.</p></div><span class="badge soft" id="s-summary"></span></div>
+      <div class="cards" id="stays"></div>
+    </section>
+
+    <section class="section" id="plan">
+      <div class="sec-head"><div><span class="eyebrow">Le plan du camping</span><h2>Choisissez votre emplacement</h2><p class="lead">Trois zones, 180 emplacements. Cliquez sur un emplacement libre pour le réserver (acompte de 30 %).</p></div></div>
+      <div class="grid-2" style="grid-template-columns: 1.6fr 1fr; align-items:start">
+        <div class="plan" data-reveal><div id="plan-svg"></div><div class="plan-legend"><span><i></i>Libre</span><span><i class="b"></i>Occupé</span><span><i class="s"></i>Votre choix</span></div></div>
+        <div class="pitch-info" data-reveal style="--i:1" id="pitch-info"></div>
+      </div>
+    </section>
+
+    <section class="section alt" id="activites">
+      <div class="sec-head"><div><span class="eyebrow">Activités & services</span><h2>Des journées bien remplies</h2><p class="lead">Ajoutez vos activités au panier et réglez-les en une fois (capture immédiate), avant ou pendant le séjour.</p></div></div>
+      <div class="act-filter" id="act-filter"></div>
+      <div class="act-grid" id="acts"></div>
+    </section>
+
+    <section class="section">
+      <div class="sec-head"><div><span class="eyebrow">Paiement fractionné</span><h2>Trente pour cent maintenant, le reste plus tard</h2><p class="lead">eSeason découpe le séjour en échéances et déclenche chaque encaissement sur Payments by Septeo.</p></div></div>
+      <div class="split-pay">
+        <div class="sp" data-reveal><div class="pct">30 %</div><b>Acompte à la réservation</b><span>Bloque l’hébergement ou l’emplacement. Capture immédiate.</span><br><span class="when">Aujourd’hui</span></div>
+        <div class="sp" data-reveal style="--i:1"><div class="pct">70 %</div><b>Solde à J-30</b><span>Rappel par e-mail avec lien de paiement, ou prélèvement sur le moyen enregistré.</span><br><span class="when">30 jours avant l’arrivée</span></div>
+        <div class="sp" data-reveal style="--i:2"><div class="pct">+</div><b>Activités & extras</b><span>Panier réglé en ligne, ou au TPE de l’accueil et du snack.</span><br><span class="when">Avant ou pendant</span></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="dt-band" data-reveal>
+        <div>
+          <span class="eyebrow" style="color:#d7ecc9">Data travel</span>
+          <h2>Des familles, pas des transactions</h2>
+          <p>Composition du foyer (adultes, enfants), animaux, immatriculation, carte ACSI, activités réservées : chaque paiement embarque le profil du séjour. eSeason en tire les statistiques qui comptent : panier activités par famille, taux d’annulation par type d’hébergement, remplissage par zone.</p>
+          <div data-pbs></div>
+        </div>
+        <div class="dt-json" id="dt-json"></div>
+      </div>
+    </section>
+
+    <section class="section"><p class="note">Démo sandbox — carte de test <strong>4111 1111 1111 1111</strong> · 03/30 · 737. Remboursement d’un acompte ou d’une activité dans la <a href="operations.html">console d'opérations</a>.</p></section>
+  </main>
+
+  <footer class="footer"><div class="wrap"><span>Camping Les Flots Bleus · Mimizan-Plage · démo sandbox</span><span>eSeason · Resalys — Septeo Hospitality</span></div></footer>
+
+  <script src="themes.js"></script>
+  <script src="theme-switcher.js"></script>
+  <script src="common.js"></script>
+  <script src="checkout.js"></script>
+  <script src="site.js"></script>
+  <script src="data/camping.js"></script>
+  <script>
+    (function () {
+      var D = window.DATA_CAMP, S = window.SITE;
+      var inEl = document.getElementById('s-in'), nEl = document.getElementById('s-nights'), aEl = document.getElementById('s-adults'), kEl = document.getElementById('s-kids');
+      var d0 = new Date(); var toSat = (6 - d0.getDay() + 7) % 7 || 7;
+      inEl.value = S.qs('in') || S.today(toSat + 21); inEl.min = S.today(0);
+      if (S.qs('nights')) nEl.value = S.qs('nights'); if (S.qs('adults')) aEl.value = S.qs('adults'); if (S.qs('kids')) kEl.value = S.qs('kids');
+      function isHigh(iso) { var m = Number(iso.slice(5, 7)); return m === 7 || m === 8; }
+      function stayPrice(s, a, n) { var t = 0; for (var i = 0; i < n; i++) { var c = S.addDays(a, i); t += s.night + (isHigh(c) ? s.highPlus : 0); } return t; }
+
+      function render() {
+        var a = inEl.value, n = Number(nEl.value), ad = Number(aEl.value), kd = Number(kEl.value), pax = ad + kd;
+        document.getElementById('s-summary').textContent = n + ' nuits · ' + ad + ' ad. · ' + kd + ' enf. · dès le ' + S.fmtDate(a);
+        document.getElementById('stays').innerHTML = D.stays.map(function (s, i) {
+          var total = stayPrice(s, a, n) + D.taxeSejour * ad * n, tooSmall = s.capacity < pax;
+          var link = 'camping-hebergement.html?id=' + s.id + '&in=' + a + '&nights=' + n + '&adults=' + ad + '&kids=' + kd;
+          return '<a class="card stay-card" href="' + link + '" data-reveal style="--i:' + i + '">' +
+            '<div class="c-photo"><img src="' + s.photos[0][0] + '" alt="' + S.esc(s.name) + '" loading="lazy"><div class="badges"><span class="badge acc">' + S.esc(s.badge) + '</span>' + (tooSmall ? '<span class="badge warn">Max ' + s.capacity + ' pers.</span>' : '') + '</div><span class="c-count">📷 ' + s.photos.length + '</span></div>' +
+            '<div class="c-body"><div class="zone">📍 ' + S.esc(s.zone) + '</div><div class="c-title"><h3>' + S.esc(s.name) + '</h3></div>' +
+            '<div class="c-specs"><span data-ico="👥">' + s.capacity + ' pers.</span>' + (s.bedrooms ? '<span data-ico="🛏️">' + s.bedrooms + ' ch.</span>' : '') + '<span data-ico="📐">' + s.size + ' m²</span>' + (s.terrace ? '<span data-ico="🪵">terrasse ' + s.terrace + ' m²</span>' : '') + '</div>' +
+            '<div class="c-meta">' + S.stars(s.rating, s.reviewsCount) + '</div>' +
+            '<p class="c-desc">' + S.esc(s.tagline) + '.</p>' +
+            '<div class="c-foot"><div class="c-price">' + S.euros(total) + '<small>' + n + ' nuits · dès ' + S.euros(s.night) + '/nuit</small></div><span class="c-go">Voir la fiche</span></div></div></a>';
+        }).join('');
+        S.reveal();
+        var j = { shopper: { firstName: 'Juliette', lastName: 'Moreau', email: 'juliette.moreau@example.fr' }, metadata: { vertical: 'camping', stay: 'Mobil-home Premium Océan', checkIn: a, nights: n, adults: ad, children: kd, pets: 'Oui (1 chien)', vehicle: 'EF-456-GH', acsi: 'Oui', activities: ['kayak', 'kids'], step: 'acompte 30 %' } };
+        document.getElementById('dt-json').innerHTML = JSON.stringify(j, null, 2).replace(/"([^"]+)":/g, '<span class="k">"$1"</span>:').replace(/: "([^"]*)"/g, ': <span class="s">"$1"</span>').replace(/: (\d+)/g, ': <span class="n">$1</span>');
+      }
+      document.getElementById('search').addEventListener('submit', function (e) { e.preventDefault(); render(); document.getElementById('hebergements').scrollIntoView({ behavior: 'smooth' }); });
+      [inEl, nEl, aEl, kEl].forEach(function (el) { el.addEventListener('change', render); });
+      render();
+
+      // ---- plan du camping (SVG) ----
+      var pitches = [], sel = null, seedP = 11;
+      D.zones.forEach(function (z, zi) {
+        var cols = 6, rows = 4, pw = (z.w - 4) / cols, ph = (z.h - 10) / rows;
+        for (var r = 0; r < rows; r++) for (var c = 0; c < cols; c++) {
+          var num = (zi + 1) * 100 + r * cols + c + 1;
+          pitches.push({ n: num, zone: z, x: z.x + 2 + c * pw, y: z.y + 8 + r * ph, w: pw - 1.2, h: ph - 1.2, busy: S.rand(seedP + num) < 0.42, shade: S.rand(num * 3) < 0.5 ? 'ombragé' : 'semi-ombragé', size: 110 + Math.round(S.rand(num * 7) * 3) * 10 });
+        }
+      });
+      function drawPlan() {
+        var svg = '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Plan du camping">';
+        D.zones.forEach(function (z) { svg += '<rect class="zone-rect" x="' + z.x + '" y="' + z.y + '" width="' + z.w + '" height="' + z.h + '" fill="' + z.color + '"/><text class="zone-lab" x="' + (z.x + 2) + '" y="' + (z.y + 5.5) + '" style="font-size:4.2px">' + z.name + '</text>'; });
+        svg += '<path class="road" d="M50 98 L50 55 M50 55 L20 47 M50 55 L75 52 M50 55 L50 5"/>';
+        pitches.forEach(function (p) { svg += '<rect class="pitch ' + (p.busy ? 'busy' : '') + (sel && sel.n === p.n ? ' sel' : '') + '" data-n="' + p.n + '" x="' + p.x + '" y="' + p.y + '" width="' + p.w + '" height="' + p.h + '"/><text class="pitch-n" x="' + (p.x + p.w / 2) + '" y="' + (p.y + p.h / 2 + 2) + '" text-anchor="middle" style="font-size:3.2px">' + p.n + '</text>'; });
+        D.pois.forEach(function (p) { svg += '<text class="poi" x="' + p[2] + '" y="' + p[3] + '" text-anchor="middle" style="font-size:5px">' + p[0] + '</text><text class="poi-lab" x="' + p[2] + '" y="' + (p[3] + 4) + '" text-anchor="middle" style="font-size:2.6px">' + p[1] + '</text>'; });
+        svg += '</svg>';
+        document.getElementById('plan-svg').innerHTML = svg;
+        document.querySelectorAll('.pitch:not(.busy)').forEach(function (r) { r.addEventListener('click', function () { sel = pitches.filter(function (p) { return p.n === Number(r.getAttribute('data-n')); })[0]; drawPlan(); renderPitch(); }); });
+      }
+      function renderPitch() {
+        var box = document.getElementById('pitch-info');
+        var a = inEl.value, n = Number(nEl.value), ad = Number(aEl.value);
+        var E = D.stays.filter(function (s) { return s.id === 'emplacement'; })[0];
+        if (!sel) { box.innerHTML = '<div class="empty-state" style="border:none;padding:24px 10px"><div class="e-ico">🗺️</div>Cliquez sur un emplacement libre du plan pour voir ses caractéristiques et le réserver.</div><p class="hint">Emplacement Grand Confort : dès ' + S.euros(E.night) + ' / nuit (2 pers., électricité 10 A, eau).</p>'; return; }
+        var total = stayPrice(E, a, n) + D.taxeSejour * ad * n, dep = Math.round(total * D.depositRate / 100) * 100;
+        box.innerHTML = '<span class="eyebrow">' + S.esc(sel.zone.name) + '</span><h3>Emplacement n° ' + sel.n + '</h3>' +
+          '<div class="chips" style="margin-bottom:12px"><span class="chip-t">📐 ' + sel.size + ' m²</span><span class="chip-t">🌳 ' + sel.shade + '</span><span class="chip-t">⚡ 10 A</span><span class="chip-t">💧 eau + évacuation</span>' + (sel.zone.id === 'ocean' ? '<span class="chip-t acc">🏖️ plage à 300 m</span>' : sel.zone.id === 'foret' ? '<span class="chip-t acc">🌲 grand calme</span>' : '<span class="chip-t acc">🏊 proche piscine</span>') + '</div>' +
+          '<div class="bc-row"><span class="lab">' + n + ' nuits dès le ' + S.fmtDate(a) + '</span><span class="val">' + S.euros(total) + '</span></div>' +
+          '<div class="bc-row"><span class="lab">Acompte 30 % aujourd’hui</span><span class="val">' + S.euros(dep) + '</span></div>' +
+          '<div class="bc-row"><span class="lab">Solde à J-30</span><span class="val">' + S.euros(total - dep) + '</span></div>' +
+          '<button class="btn accent block" id="pitch-go" style="margin-top:12px">Réserver l’emplacement ' + sel.n + ' — ' + S.euros(dep) + '</button>' +
+          '<a class="hint" href="camping-hebergement.html?id=emplacement&in=' + a + '&nights=' + n + '&adults=' + ad + '&kids=' + kEl.value + '&pitch=' + sel.n + '" style="display:block;margin-top:8px;text-align:center">Voir la fiche « Emplacement Grand Confort » →</a>';
+        document.getElementById('pitch-go').onclick = function () {
+          PMS.checkout({ mode: 'immediate', amount: dep, itemLabel: 'Acompte 30 % — Emplacement n° ' + sel.n, summary: [['Emplacement', 'n° ' + sel.n + ' · ' + sel.zone.name + ' · ' + sel.size + ' m²'], ['Séjour', S.fmtDate(a) + ' · ' + n + ' nuits'], ['Total séjour', S.euros(total)], ['Acompte', S.euros(dep)], ['Solde à J-30', S.euros(total - dep)]], prefill: { stay: 'Emplacement n° ' + sel.n + ' (' + sel.zone.name + ')', checkIn: a, nights: String(n), adults: aEl.value, children: kEl.value } });
+        };
+      }
+      drawPlan(); renderPitch();
+      [inEl, nEl, aEl].forEach(function (el) { el.addEventListener('change', renderPitch); });
+
+      // ---- activités ----
+      var cats = ['Toutes']; D.activities.forEach(function (x) { if (cats.indexOf(x.cat) < 0) cats.push(x.cat); });
+      var curCat = 'Toutes';
+      document.getElementById('act-filter').innerHTML = cats.map(function (c) { return '<button type="button" data-c="' + c + '" class="' + (c === curCat ? 'on' : '') + '">' + c + '</button>'; }).join('');
+      document.querySelectorAll('#act-filter button').forEach(function (b) { b.onclick = function () { curCat = b.getAttribute('data-c'); document.querySelectorAll('#act-filter button').forEach(function (x) { x.classList.toggle('on', x === b); }); renderActs(); }; });
+      function renderActs() {
+        document.getElementById('acts').innerHTML = D.activities.filter(function (x) { return curCat === 'Toutes' || x.cat === curCat; }).map(function (x, i) {
+          return '<div class="act" data-reveal style="--i:' + (i % 4) + '"><img src="' + x.img + '" alt="" loading="lazy"><div class="a-b"><b><span>' + x.ico + '</span>' + S.esc(x.name) + '</b><p>' + S.esc(x.desc) + '</p>' +
+            '<div class="a-f"><span class="p">' + (x.price ? S.euros(x.price) + ' <small>/ ' + S.esc(x.per) + '</small>' : 'Inclus') + '</span>' + (x.price ? '<button class="btn sm accent" data-add data-id="act-' + x.id + '" data-name="' + S.esc(x.name) + '" data-price="' + x.price + '" data-img="' + x.img + '">+ Ajouter</button>' : '<span class="badge ok">Inclus</span>') + '</div></div></div>';
+        }).join('');
+        S.reveal();
+      }
+      renderActs();
+    })();
+  </script>
+</body>
+</html>

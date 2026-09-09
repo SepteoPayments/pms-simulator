@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Payments by Septeo — Simulateur métiers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="styles.css" /><link rel="stylesheet" href="ui.css" /><link rel="stylesheet" href="skins.css" />
+<style>
+  body.home { font-family: 'Inter', 'Segoe UI', sans-serif; }
+  .home h1, .home h2, .home h3, .home .tt-name { font-family: 'Space Grotesk', 'Segoe UI', sans-serif; letter-spacing: -.02em; }
+  .home-bar .brand { gap: 12px; }
+  .home-bar .brand .pbs-logo { height: 30px; }
+  .home-bar .brand small { letter-spacing: .12em; }
+  .home-bar .pbs-top { display: none; }
+  .stage { min-height: 86vh; }
+  .stage-live h1 { font-size: clamp(38px, 6vw, 68px); }
+  .stage-meta { display: flex; gap: 10px; flex-wrap: wrap; margin: 14px 0 0; }
+  .stage-meta span { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2); padding: 6px 12px; border-radius: 999px; font-size: 12.5px; backdrop-filter: blur(6px); }
+  .stage-side { position: absolute; right: 22px; top: 90px; width: 300px; background: rgba(8,16,26,.55); border: 1px solid rgba(255,255,255,.12); border-radius: 16px; padding: 16px 18px; color: #fff; backdrop-filter: blur(10px); z-index: 2; }
+  .stage-side .ss-lab { font-size: 11px; text-transform: uppercase; letter-spacing: .14em; opacity: .7; font-weight: 600; }
+  .stage-side .ss-pitch { font-size: 13.5px; line-height: 1.5; margin: 6px 0 12px; color: rgba(255,255,255,.9); }
+  .stage-side .ss-flow { display: grid; gap: 6px; }
+  .stage-side .ss-flow div { display: flex; gap: 8px; align-items: center; font-size: 12.5px; }
+  .stage-side .ss-flow i { width: 22px; height: 22px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; font-size: 11px; font-weight: 700; font-style: normal; flex: none; }
+  @media (max-width: 1000px) { .stage-side { display: none; } }
+  .kstrip { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid rgba(255,255,255,.1); border-bottom: 1px solid rgba(255,255,255,.1); }
+  .kstrip div { padding: 22px; text-align: center; border-right: 1px solid rgba(255,255,255,.1); }
+  .kstrip div:last-child { border-right: none; }
+  .kstrip b { display: block; font-family: 'Space Grotesk', sans-serif; font-size: 34px; color: #fff; line-height: 1; }
+  .kstrip span { font-size: 12.5px; color: #8ea2b0; text-transform: uppercase; letter-spacing: .1em; }
+  @media (max-width: 700px) { .kstrip { grid-template-columns: 1fr 1fr; } .kstrip div:nth-child(2) { border-right: none; } }
+  .theme-rail { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 18px; }
+  .theme-thumb { position: relative; }
+  .theme-thumb .tt-cover { position: relative; }
+  .theme-thumb .tt-cover::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 50%, rgba(8,16,26,.75)); }
+  .theme-thumb .tt-emoji { position: absolute; left: 12px; top: 12px; width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,.92); display: grid; place-items: center; font-size: 18px; z-index: 1; }
+  .theme-thumb .tt-mode { position: absolute; left: 12px; bottom: 12px; z-index: 1; font-size: 11px; font-weight: 700; color: #fff; background: var(--accent); padding: 3px 9px; border-radius: 999px; }
+  .theme-thumb .tt-brand { display: block; font-size: 12px; color: #c9d5df; margin-top: 4px; }
+  .theme-thumb .tt-go { display: block; margin-top: 10px; font-size: 12.5px; font-weight: 700; color: var(--accent); }
+  .modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .mode { background: #14232f; border: 1px solid #22323d; border-radius: 16px; padding: 22px; color: #eaf0f5; position: relative; overflow: hidden; }
+  .mode::after { content: attr(data-code); position: absolute; right: 14px; top: 10px; font-family: ui-monospace, Consolas, monospace; font-size: 11px; color: #8ea2b0; background: #0e1922; padding: 3px 8px; border-radius: 6px; }
+  .mode .m-ico { font-size: 28px; margin-bottom: 8px; }
+  .mode h3 { margin: 0 0 6px; font-size: 19px; color: #fff; }
+  .mode p { margin: 0; color: #9fb0bd; font-size: 13.5px; line-height: 1.55; }
+  .mode ul { margin: 10px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 6px; }
+  .mode ul li { font-size: 11.5px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); padding: 3px 8px; border-radius: 999px; color: #c9d5df; }
+  @media (max-width: 800px) { .modes { grid-template-columns: 1fr; } }
+  .home .dt-band { background: #14232f; border: 1px solid #22323d; }
+  .home .dt-band h2 { font-size: 26px; }
+  .home .sec-head h2 { color: #eaf0f5; font-size: 26px; }
+  .home .sec-head p, .home .lead { color: #9fb0bd; }
+  .home .eyebrow { color: #ef6a44; }
+  .home .footer .wrap { align-items: center; }
+</style>
+</head>
+<body class="home theme-septeo">
+  <header class="topbar home-bar dark">
+    <div class="wrap">
+      <a class="brand" href="index.html"><span class="pbs-svg" id="brand-logo"></span><span><small style="display:block">Simulateur des métiers Septeo</small></span></a>
+      <nav class="nav">
+        <a href="#univers">Univers</a>
+        <a href="#modes">Modes de paiement</a>
+        <a class="cta" href="operations.html">Console d'opérations</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="stage" id="stage">
+      <div class="stage-bg" id="stageBg" aria-hidden="true"></div>
+      <div class="stage-scrim" aria-hidden="true"></div>
+
+      <aside class="stage-side" id="stageSide">
+        <div class="ss-lab">Ce que fait le logiciel métier</div>
+        <div class="ss-pitch" id="sPitch">—</div>
+        <div class="ss-lab">Le parcours de paiement</div>
+        <div class="ss-flow"><div><i>1</i> Fiche produit → montant calculé</div><div><i>2</i> Formulaire client + données métier</div><div><i>3</i> Drop-in Adyen (sandbox) → confirmation</div></div>
+      </aside>
+
+      <div class="stage-content wrap">
+        <span class="eyebrow light">Une seule API de paiement · huit métiers Septeo · huit expériences</span>
+        <div class="stage-live" id="stageLive">
+          <div class="s-product" id="sProduct">—</div>
+          <h1 id="sName">—</h1>
+          <p class="s-tagline" id="sTagline">—</p>
+          <span class="s-mode" id="sMode">—</span>
+          <div class="stage-meta" id="sMeta"></div>
+          <div class="s-actions">
+            <a class="btn stage-enter" id="sEnter" href="#">Entrer dans l'univers →</a>
+            <span class="s-hint">Vraies sessions, vrai Drop-in Adyen (argent fictif). Carte de test 4111 1111 1111 1111.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stage-dots" id="stageDots" aria-hidden="true"></div>
+    </section>
+
+    <section class="wrap">
+      <div class="kstrip">
+        <div><b>8</b><span>univers métier</span></div>
+        <div><b>3</b><span>modes de paiement</span></div>
+        <div><b>1</b><span>API publique</span></div>
+        <div><b id="k-fiches">—</b><span>fiches produit détaillées</span></div>
+      </div>
+    </section>
+
+    <section class="wrap rail-wrap" id="univers">
+      <div class="rail-head">
+        <span class="eyebrow">Choisissez un univers</span>
+        <h2>Huit métiers, huit marques, un seul moteur de paiement</h2>
+        <p>Survolez pour prévisualiser, cliquez pour entrer. Chaque univers a sa marque, sa palette, ses fiches produit et ses champs client ; derrière, la <strong>même API Payments by Septeo</strong>.</p>
+      </div>
+      <div class="theme-rail" id="themeRail"></div>
+    </section>
+
+    <section class="wrap" id="modes" style="padding: 40px 22px 10px">
+      <div class="sec-head"><div><span class="eyebrow">Sous le capot</span><h2>Trois modes, tous les cas d’usage</h2><p class="lead">Chaque bouton « payer » des vitrines choisit l’un de ces trois modes. La console d’opérations gère la suite (capture, remboursement, prolongation, rejeu).</p></div></div>
+      <div class="modes">
+        <div class="mode" data-code="mode: immediate" data-reveal><div class="m-ico">⚡</div><h3>Paiement immédiat</h3><p>Le montant est autorisé et capturé en une fois. Le cas simple : soin de spa, loyer, séquestre, addition, acompte.</p><ul><li>Spa</li><li>Gestion locative</li><li>Transaction</li><li>Restauration</li><li>Camping · Location (acompte, solde)</li></ul></div>
+        <div class="mode" data-code="mode: caution" data-reveal style="--i:1"><div class="m-ico">🛡️</div><h3>Empreinte de garantie</h3><p>Pré-autorisation : le montant est gelé, jamais débité tant que tout va bien. Capture partielle ou libération ensuite, prolongation possible.</p><ul><li>Hôtel (1 nuit)</li><li>Location (dépôt)</li><li>Gestion locative (dépôt)</li><li>Spa (no-show)</li><li>Restaurant (groupe)</li></ul></div>
+        <div class="mode" data-code="mode: mandate" data-reveal style="--i:2"><div class="m-ico">🔁</div><h3>Mandat récurrent</h3><p>Le moyen de paiement est enregistré (tokenisation) lors d’un premier paiement. Les échéances suivantes sont initiées par le logiciel métier.</p><ul><li>Gestion locative (loyer mensuel)</li><li>Syndic (charges trimestrielles)</li></ul></div>
+      </div>
+    </section>
+
+    <section class="wrap" style="padding: 30px 22px 10px">
+      <div class="dt-band" data-reveal>
+        <div>
+          <span class="eyebrow">Data travel</span>
+          <h2>Le paiement transporte le client, pas seulement le montant</h2>
+          <p>Dans chaque univers, le formulaire collecte l’identité du client et des champs propres au métier (dates de séjour, référence de bail, lot de copropriété, couverts, étude notariale…). Deux personas, Charles et Juliette, remplissent tout en un clic. Ces données suivent le paiement et nourrissent, à terme, des statistiques par type de client.</p>
+          <div data-pbs></div>
+        </div>
+        <div class="dt-json" id="dt-json"></div>
+      </div>
+    </section>
+
+    <section class="wrap">
+      <p class="note" style="margin-top:30px">Démo sandbox : tous les univers tapent la même boutique de test Adyen. C’est voulu — la boutique est agnostique, les métiers sont des habillages. Aucun argent réel ne circule.</p>
+    </section>
+  </main>
+
+  <footer class="footer dark"><div class="wrap"><span>Payments by Septeo — démo interne (sandbox) · API publique agnostique, multi-PSP</span></div></footer>
+
+  <script src="themes.js"></script>
+  <script src="site.js"></script>
+  <script>
+    (function () {
+      var T = window.THEMES || [], S = window.SITE;
+      S.logo(function (svg) { document.getElementById('brand-logo').innerHTML = svg; });
+      var stage = document.getElementById('stage'), bg = document.getElementById('stageBg'), dotsWrap = document.getElementById('stageDots'), rail = document.getElementById('themeRail');
+      var el = { product: document.getElementById('sProduct'), name: document.getElementById('sName'), tagline: document.getElementById('sTagline'), mode: document.getElementById('sMode'), enter: document.getElementById('sEnter'), live: document.getElementById('stageLive'), pitch: document.getElementById('sPitch'), meta: document.getElementById('sMeta'), side: document.getElementById('stageSide') };
+      var cur = 0, timer = null, paused = false, INTERVAL = 5500;
+      var FICHES = { hotel: '4 chambres', camping: '4 hébergements · 10 activités', spa: '6 soins · 3 cures', location: '4 logements', gestion: 'espace locataire', syndic: 'extranet copro', transaction: '3 biens', resto: '20 plats · plan de salle' };
+      document.getElementById('k-fiches').textContent = '40+';
+
+      T.forEach(function (t, i) {
+        var s = document.createElement('div'); s.className = 'slide'; s.style.backgroundImage = "url('" + t.img + "')"; bg.appendChild(s);
+        var d = document.createElement('button'); d.className = 'pdot'; d.type = 'button'; d.title = t.name; d.addEventListener('click', function () { show(i); pauseFor(); }); dotsWrap.appendChild(d);
+        var a = document.createElement('a'); a.className = 'theme-thumb'; a.href = t.page; a.style.setProperty('--accent', t.accent);
+        a.innerHTML = "<span class='tt-cover' style=\"background-image:url('" + t.img + "')\"><span class='tt-emoji'>" + t.emoji + "</span><span class='tt-mode'>" + S.esc(t.mode) + "</span></span>" +
+          "<span class='tt-body'><span class='tt-name'>" + S.esc(t.name) + "</span><span class='tt-product'>" + S.esc(t.product) + "</span><span class='tt-brand'>" + S.esc(t.brand) + " · " + S.esc(FICHES[t.key] || '') + "</span><span class='tt-go'>Entrer →</span></span>";
+        a.addEventListener('mouseenter', function () { show(i); paused = true; stop(); });
+        a.addEventListener('mouseleave', function () { paused = false; start(); });
+        a.addEventListener('focus', function () { show(i); });
+        rail.appendChild(a);
+      });
+      var slides = bg.querySelectorAll('.slide'), dots = dotsWrap.querySelectorAll('.pdot'), thumbs = rail.querySelectorAll('.theme-thumb');
+      function show(i) {
+        cur = i; var t = T[i];
+        for (var k = 0; k < slides.length; k++) slides[k].classList.toggle('on', k === i);
+        for (var d = 0; d < dots.length; d++) dots[d].classList.toggle('on', d === i);
+        for (var m = 0; m < thumbs.length; m++) thumbs[m].classList.toggle('on', m === i);
+        el.live.style.setProperty('--accent', t.accent); el.side.style.setProperty('--accent', t.accent);
+        el.product.textContent = t.emoji + '  ' + t.product + '  ·  ' + t.brand;
+        el.name.textContent = t.name; el.tagline.textContent = t.tagline; el.mode.textContent = t.mode; el.pitch.textContent = t.pitch;
+        el.meta.innerHTML = '<span>📍 ' + S.esc(t.city) + '</span><span>🗂️ ' + S.esc(FICHES[t.key] || '') + '</span><span>🏷️ ' + S.esc(t.brandSub) + '</span>';
+        el.enter.setAttribute('href', t.page); el.enter.textContent = 'Entrer — ' + t.brand + ' →';
+        el.live.classList.remove('swap'); void el.live.offsetWidth; el.live.classList.add('swap');
+      }
+      function next() { show((cur + 1) % T.length); }
+      function start() { if (!timer && !paused) timer = setInterval(next, INTERVAL); }
+      function stop() { clearInterval(timer); timer = null; }
+      function pauseFor() { stop(); paused = true; setTimeout(function () { paused = false; start(); }, 9000); }
+      stage.addEventListener('mouseenter', stop); stage.addEventListener('mouseleave', function () { if (!paused) start(); });
+      document.addEventListener('visibilitychange', function () { document.hidden ? stop() : start(); });
+      if (T.length) { show(0); start(); }
+      var j = { amount: { value: 21500, currency: 'EUR' }, mode: 'caution', shopper: { firstName: 'Juliette', lastName: 'Moreau', email: 'juliette.moreau@example.fr', dateOfBirth: '1992-09-27', billingAddress: { city: 'Lyon', country: 'FR' } }, metadata: { vertical: 'hotel', room: 'Supérieure Vue Mer', checkIn: S.today(12), checkOut: S.today(14), guests: 2, purpose: 'Loisir', loyalty: 'Aucun' } };
+      document.getElementById('dt-json').innerHTML = JSON.stringify(j, null, 2).replace(/"([^"]+)":/g, '<span class="k">"$1"</span>:').replace(/: "([^"]*)"/g, ': <span class="s">"$1"</span>').replace(/: (\d+)/g, ': <span class="n">$1</span>');
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Saint-Jean Immobilier — Biens en vente · Compromis & séquestre en ligne</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="styles.css" /><link rel="stylesheet" href="ui.css" /><link rel="stylesheet" href="skins.css" />
+<link rel="stylesheet" href="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.68.0/adyen.css" />
+<script src="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.68.0/adyen.js"></script>
+<style>
+  .t-hero { min-height: 76vh; display: flex; align-items: center; }
+  .t-hero .inner { padding: 80px 0; }
+  .t-hero h1 { font-size: clamp(38px, 5.6vw, 66px); font-weight: 500; max-width: 18ch; line-height: 1.05; }
+  .t-hero .seal { display: inline-flex; align-items: center; gap: 10px; border: 1px solid rgba(255,255,255,.35); padding: 8px 14px; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; margin-bottom: 18px; }
+  .t-hero .seal i { width: 8px; height: 8px; background: var(--accent); display: inline-block; transform: rotate(45deg); }
+  .bien-card .c-photo { aspect-ratio: 4/3; }
+  .bien-card .c-specs { display: flex; gap: 12px; font-size: 12.5px; color: var(--muted); flex-wrap: wrap; text-transform: uppercase; letter-spacing: .04em; }
+  .bien-card .where { font-size: 12.5px; color: var(--accent); font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+  .bien-card .dpe-mini { display: inline-grid; place-items: center; width: 26px; height: 26px; color: #fff; font-weight: 800; font-size: 12px; border-radius: 2px; }
+  .seq-flow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; position: relative; }
+  .seq-flow::before { content: ''; position: absolute; left: 10%; right: 10%; top: 26px; height: 1px; background: var(--accent); opacity: .5; }
+  .seq-flow .s { text-align: center; padding: 0 10px; position: relative; }
+  .seq-flow .s .n { width: 52px; height: 52px; border-radius: 50%; background: var(--surface); border: 1px solid var(--accent); color: var(--accent); font-family: var(--font-head); font-size: 22px; display: grid; place-items: center; margin: 0 auto 12px; position: relative; z-index: 1; }
+  .seq-flow .s.hl .n { background: var(--accent); color: #fff; }
+  .seq-flow .s b { display: block; font-family: var(--font-head); font-size: 17px; margin-bottom: 4px; color: var(--brand); }
+  .seq-flow .s span { font-size: 12.5px; color: var(--muted); line-height: 1.5; display: block; }
+  .seq-flow .s .mode { display: inline-block; margin-top: 8px; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent-ink); font-weight: 700; }
+  @media (max-width: 900px) { .seq-flow { grid-template-columns: 1fr 1fr; gap: 20px; } .seq-flow::before { display: none; } }
+  .people { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .people .person { padding: 20px 22px; border-radius: 4px; }
+  .people .person img { width: 84px; height: 84px; }
+  .calc { background: var(--brand); color: #fff; border-radius: 4px; padding: 26px 28px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center; }
+  .calc h3 { color: #fff; margin: 0 0 6px; font-size: 24px; }
+  .calc p { color: rgba(255,255,255,.8); margin: 0; font-size: 14px; }
+  .calc .c-in { display: flex; flex-direction: column; gap: 10px; }
+  .calc input[type=range] { width: 100%; accent-color: var(--accent); }
+  .calc .c-out { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15); border-radius: 4px; padding: 16px 18px; display: grid; gap: 8px; font-size: 14px; }
+  .calc .c-out div { display: flex; justify-content: space-between; gap: 10px; }
+  .calc .c-out b { font-variant-numeric: tabular-nums; }
+  .calc .c-out .big { font-family: var(--font-head); font-size: 26px; color: #ffd28a; }
+  @media (max-width: 800px) { .calc { grid-template-columns: 1fr; } .people { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body class="theme-transaction" data-theme-key="transaction">
+  <header class="topbar dark">
+    <div class="wrap">
+      <a class="brand" href="transaction.html"><span class="dot">SJ</span><span>Saint-Jean Immobilier<small>Lyon · SPI Transaction · Modelo by Septeo</small></span></a>
+      <nav class="nav">
+        <a href="#biens">Biens</a>
+        <a href="#sequestre">Le séquestre</a>
+        <a class="cta" href="operations.html">Console d'opérations</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero t-hero">
+    <div class="bg" style="background-image:url('img/transaction-hero.jpg')"></div>
+    <div class="scrim"></div>
+    <div class="wrap inner">
+      <div class="seal"><i></i> Agence & étude notariale partenaire <i></i></div>
+      <h1>Acheter un bien, signer sereinement</h1>
+      <p>Trois biens d’exception à Lyon et ses environs. Le jour du compromis, l’acquéreur verse le <strong>séquestre de 5 %</strong> en ligne, directement sur le compte de l’étude — tracé, horodaté, imputé sur le prix à l’acte. SPI Transaction et Modelo orchestrent, <strong>Payments by Septeo</strong> encaisse les gros montants.</p>
+      <div class="pills"><span class="pill">Séquestre 5 % en ligne</span><span class="pill">Gros montants sécurisés</span><span class="pill">Suivi de la vente</span></div>
+    </div>
+  </section>
+
+  <main class="wrap">
+    <section class="section" id="biens">
+      <div class="sec-head"><div><span class="eyebrow">Nos biens en vente</span><h2>Une sélection, pas un catalogue</h2><p class="lead">Chaque fiche détaille galerie, plans par pièce, diagnostics (DPE, amiante, plomb…), étapes de la vente et échéancier du séquestre.</p></div></div>
+      <div class="cards" id="biens-grid"></div>
+    </section>
+
+    <section class="section" id="sequestre">
+      <div class="sec-head"><div><span class="eyebrow">Le parcours d’acquisition</span><h2>Du compromis à l’acte, en cinq temps</h2></div></div>
+      <div class="seq-flow">
+        <div class="s" data-reveal><div class="n">1</div><b>Offre acceptée</b><span>Négociation menée par l’agence, offre d’achat contresignée.</span></div>
+        <div class="s hl" data-reveal style="--i:1"><div class="n">2</div><b>Compromis</b><span>Signature chez le notaire. L’acquéreur verse le séquestre de 5 % en ligne, le jour même.</span><span class="mode">Paiement immédiat · gros montant</span></div>
+        <div class="s" data-reveal style="--i:2"><div class="n">3</div><b>Rétractation</b><span>10 jours. En cas de rétractation, le séquestre est intégralement remboursé.</span><span class="mode">Refund total</span></div>
+        <div class="s" data-reveal style="--i:3"><div class="n">4</div><b>Conditions</b><span>Prêt obtenu, préemption purgée, diagnostics levés.</span></div>
+        <div class="s" data-reveal style="--i:4"><div class="n">5</div><b>Acte authentique</b><span>Le séquestre est imputé sur le prix, les clés sont remises.</span></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="calc" data-reveal>
+        <div>
+          <span class="eyebrow" style="color:#ffd28a">Simulateur</span>
+          <h3>Combien verser au compromis ?</h3>
+          <p>Le séquestre (ou dépôt de garantie) est d’usage fixé à 5 % du prix de vente, consigné par le notaire jusqu’à l’acte. Faites glisser le prix.</p>
+          <div class="c-in" style="margin-top:14px"><input type="range" id="c-range" min="150000" max="2000000" step="5000" value="845000"><div style="display:flex;justify-content:space-between;font-size:12px;opacity:.7"><span>150 000 €</span><span>2 000 000 €</span></div></div>
+        </div>
+        <div class="c-out">
+          <div><span>Prix de vente</span><b id="c-price"></b></div>
+          <div><span>Séquestre 5 % au compromis</span><b class="big" id="c-seq"></b></div>
+          <div><span>Frais de notaire estimés (~7,5 % ancien)</span><b id="c-fees"></b></div>
+          <div><span>Reste à financer à l’acte</span><b id="c-rest"></b></div>
+          <button class="btn" id="c-go" style="background:var(--accent);margin-top:6px">Verser ce séquestre (démo)</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="sec-head"><div><span class="eyebrow">Vos interlocuteurs</span><h2>Une agence, une étude</h2></div></div>
+      <div class="people">
+        <div class="person" data-reveal><img src="img/tr-agent.jpg" alt=""><div><div class="p-name">Claire Fontanel</div><div class="p-role">Négociatrice · Saint-Jean Immobilier</div><div class="p-bio">Quinze ans sur la Presqu’île et l’Ouest lyonnais. Elle accompagne acquéreurs et vendeurs de la première visite à la remise des clés.</div><div class="p-contact">4 rue Saint-Jean, Lyon 5e · 06 00 00 00 00</div></div></div>
+        <div class="person" data-reveal style="--i:1"><img src="img/tr-notaire.jpg" alt=""><div><div class="p-name">Me Alexandre Dubois</div><div class="p-role">Notaire · Dubois & Associés</div><div class="p-bio">L’étude reçoit les séquestres sur son compte de consignation via Payments by Septeo : versement horodaté, rapproché automatiquement dans le dossier de vente.</div><div class="p-contact">12 quai Tilsitt, Lyon 2e · CRPCEN 69042</div></div></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="dt-band" data-reveal>
+        <div>
+          <span class="eyebrow" style="color:#ffd28a">Data travel</span>
+          <h2>Un versement, un dossier de vente</h2>
+          <p>Référence du mandat, étude notariale, qualité de l’acquéreur (particulier, indivision, SCI), mode de financement, co-acquéreur, date de signature : le séquestre arrive chez le notaire déjà qualifié. SPI Transaction suit les délais de rétractation et le taux de ventes menées à l’acte par type de financement.</p>
+          <div data-pbs></div>
+        </div>
+        <div class="dt-json" id="dt-json"></div>
+      </div>
+    </section>
+
+    <section class="section"><p class="note">Démo sandbox — carte de test <strong>4111 1111 1111 1111</strong> · 03/30 · 737. Remboursement du séquestre (rétractation) dans la <a href="operations.html">console d'opérations</a>.</p></section>
+  </main>
+
+  <footer class="footer"><div class="wrap"><span>Saint-Jean Immobilier · 4 rue Saint-Jean, Lyon 5e · démo sandbox</span><span>SPI Transaction · Modelo — Septeo Real Estate</span></div></footer>
+
+  <script src="themes.js"></script>
+  <script src="theme-switcher.js"></script>
+  <script src="common.js"></script>
+  <script src="checkout.js"></script>
+  <script src="site.js"></script>
+  <script src="data/transaction.js"></script>
+  <script>
+    (function () {
+      var D = window.DATA_TR, S = window.SITE;
+      var DPEC = {}; D.dpeScale.forEach(function (d) { DPEC[d[0]] = d[1]; });
+      document.getElementById('biens-grid').innerHTML = D.properties.map(function (p, i) {
+        var seq = Math.round(p.price * D.sequestreRate);
+        return '<a class="card bien-card" href="transaction-bien.html?id=' + p.id + '" data-reveal style="--i:' + i + '">' +
+          '<div class="c-photo"><img src="' + p.photos[0][0] + '" alt="' + S.esc(p.name) + '" loading="lazy"><div class="badges"><span class="badge acc">' + S.esc(p.badge) + '</span><span class="badge">' + p.kind + '</span></div><span class="c-count">📷 ' + p.photos.length + '</span></div>' +
+          '<div class="c-body"><div class="where">' + S.esc(p.where) + '</div><div class="c-title"><h3>' + S.esc(p.name) + '</h3><span class="dpe-mini" style="background:' + DPEC[p.dpe] + '" title="DPE ' + p.dpe + '">' + p.dpe + '</span></div>' +
+          '<div class="c-specs"><span>' + p.size + ' m²</span><span>' + p.rooms + ' pièces</span><span>' + p.bedrooms + ' ch.</span>' + (p.land ? '<span>terrain ' + p.land + ' m²</span>' : '') + '</div>' +
+          '<p class="c-desc">' + S.esc(p.tagline) + '.</p>' +
+          '<div class="c-foot"><div class="c-price">' + S.eurosInt(p.price) + '<small>' + S.esc(p.fees) + ' · séquestre ' + S.eurosInt(seq) + '</small></div><span class="c-go">Voir le bien</span></div></div></a>';
+      }).join('');
+      var range = document.getElementById('c-range');
+      function calc() { var price = Number(range.value) * 100, seq = Math.round(price * 0.05), fees = Math.round(price * 0.075); document.getElementById('c-price').textContent = S.eurosInt(price); document.getElementById('c-seq').textContent = S.eurosInt(seq); document.getElementById('c-fees').textContent = S.eurosInt(fees); document.getElementById('c-rest').textContent = S.eurosInt(price + fees - seq); return { price: price, seq: seq, fees: fees }; }
+      range.addEventListener('input', calc); calc();
+      document.getElementById('c-go').onclick = function () { var c = calc(); PMS.checkout({ mode: 'immediate', amount: c.seq, itemLabel: 'Séquestre 5 % — compromis (simulation ' + S.eurosInt(c.price) + ')', summary: [['Prix de vente', S.eurosInt(c.price)], ['Séquestre 5 %', S.eurosInt(c.seq)], ['Consigné chez', 'Me Dubois & Associés — Lyon'], ['Imputé sur le prix', 'à la signature de l’acte']], prefill: { propertyRef: 'SIMULATION', signingDate: S.today(0) } }); };
+      var j = { shopper: { firstName: 'Charles', lastName: 'Vidal', email: 'charles.vidal@example.fr', dateOfBirth: '1985-04-12', billingAddress: { city: 'Lyon', country: 'FR' } }, metadata: { vertical: 'transaction', propertyRef: 'MAND-2026-045', property: 'Maison de famille — Écully', price: 845000, sequestre: 42250, notaryRef: 'Me Dubois & Associés — Lyon', buyerType: 'Particulier', financing: 'Prêt bancaire (80 %)', signingDate: S.today(0) } };
+      document.getElementById('dt-json').innerHTML = JSON.stringify(j, null, 2).replace(/"([^"]+)":/g, '<span class="k">"$1"</span>:').replace(/: "([^"]*)"/g, ': <span class="s">"$1"</span>').replace(/: (\d+)/g, ': <span class="n">$1</span>');
+      S.reveal();
+    })();
+  </script>
+</body>
+</html>

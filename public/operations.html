@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Console d'opérations — Payments by Septeo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="styles.css" /><link rel="stylesheet" href="ui.css" /><link rel="stylesheet" href="skins.css" />
+<style>
+  .bo { font-family: 'Inter', 'Segoe UI', sans-serif; }
+  .bo h1, .bo h2, .bo h3 { font-family: 'Space Grotesk', 'Segoe UI', sans-serif; letter-spacing: -.02em; }
+  .bo .topbar .brand small { color: #9fb0bd; }
+  .bo .topbar .pbs { color: #fff; }
+  .bo .topbar .tsw > button { color: #e7eef4; border-color: #2c3d49; }
+  .bo .topbar .tsw-menu { background: #14232f; border-color: #22323d; }
+  .bo .topbar .tsw-menu a { color: #e7eef4; }
+  .bo .topbar .tsw-menu a:hover { background: #0e1922; }
+  .bo .topbar .tsw-menu a small { color: #8ea2b0; }
+  .bo .topbar .tsw-menu .home { color: #7fd1b5; border-color: #22323d; }
+  .bo .footer { border-top: 1px solid #22323d; color: #8ea2b0; }
+  .bo .footer .pbs { color: #fff; }
+  .last { display: flex; gap: 14px; align-items: center; background: #14232f; border: 1px solid #22323d; border-left: 3px solid var(--acc, #7fd1b5); border-radius: 12px; padding: 12px 16px; margin-bottom: 18px; flex-wrap: wrap; }
+  .last .l-em { width: 40px; height: 40px; border-radius: 10px; background: rgba(255,255,255,.08); display: grid; place-items: center; font-size: 20px; }
+  .last b { color: #fff; }
+  .last small { display: block; color: #9fb0bd; font-size: 12.5px; }
+  .last code { background: #0a141c; padding: 3px 8px; border-radius: 6px; color: #b7f0da; font-size: 12.5px; }
+  .last .btn.sm { margin-left: auto; background: #7fd1b5; color: #08131b; }
+  .life { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 22px; }
+  .life div { background: #14232f; border: 1px solid #22323d; border-radius: 10px; padding: 10px 12px; font-size: 12.5px; color: #cfe0ea; }
+  .life div b { display: block; color: #7fd1b5; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 3px; }
+  @media (max-width: 900px) { .life { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body class="bo">
+  <header class="topbar dark">
+    <div class="wrap">
+      <a class="brand" href="index.html"><span class="dot" style="background:#7fd1b5;color:#08131b">S</span><span>Back-office paiements<small>Console d'opérations · tous les univers</small></span></a>
+      <nav class="nav">
+        <a href="index.html">Accueil</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap" style="padding-top:26px; padding-bottom:60px;">
+    <section class="section" style="padding:10px 0 20px">
+      <span class="eyebrow" style="color:#7fd1b5">Après-vente</span>
+      <h2>Gérer un paiement</h2>
+      <p class="lead muted">Capturez, annulez, remboursez, ajustez ou rejouez un paiement, quel que soit l’univers qui l’a initié. Ces opérations ont besoin d’identifiants
+        que le logiciel métier a reçus <strong>par webhook</strong>. Chaque champ indique <strong>de quel webhook</strong> et <strong>quel champ exact</strong> vient l’info.</p>
+    </section>
+
+    <div id="last-slot"></div>
+
+    <div class="life">
+      <div><b>Hôtel · Location · Resto</b>Empreinte → capture au départ, ajustement, libération</div>
+      <div><b>Gestion loc. · Syndic</b>Mandat → rejeu MIT chaque échéance, moyens enregistrés</div>
+      <div><b>Spa · Camping</b>Immédiat → remboursement (annulation), capture no-show</div>
+      <div><b>Transaction</b>Séquestre → remboursement total en cas de rétractation</div>
+      <div><b>Tous</b>Consulter : état, jambes, montants agrégés</div>
+    </div>
+
+    <div class="hint-box">
+      <strong>D'où viennent les identifiants ?</strong><br>
+      Quand un paiement est autorisé, le logiciel métier reçoit le webhook <b>AUTHORISATION</b>. Il doit en stocker :
+      <br>&bull; <b>pspReference</b> (racine du webhook) &rarr; identifie le paiement pour capture / annulation / remboursement / ajustement / extension.
+      <br>&bull; <b>additionalData.tokenization.storedPaymentMethodId</b> (= <b>recurring.recurringDetailReference</b>) &rarr; le token, pour rejouer un paiement (MIT).
+      <br>&bull; <b>additionalData.recurring.shopperReference</b> (ou <b>shopperReference</b> racine) &rarr; le client, pour lister/supprimer ses moyens enregistrés.
+      <br><em>NB : les champs marqués (à confirmer) dépendent des webhooks CAPTURE / REFUND / CANCELLATION que je n'ai pas encore vus - à valider avec Dylan.</em>
+    </div>
+
+    <div class="opgrid">
+      <div class="panel">
+        <h3>Opération</h3>
+        <div class="ops-list" id="ops"></div>
+        <div id="fields" style="margin-top:16px"></div>
+        <button class="btn accent block" id="run" style="margin-top:6px">Exécuter</button>
+      </div>
+
+      <div class="panel">
+        <h3>Résultat</h3>
+        <div id="op-desc" class="hint-box" style="border-left-color:#c59b6a"></div>
+        <div class="result">
+          <div class="bar" id="result-bar" style="display:none"><span class="chip" id="result-chip"></span><span class="muted" id="result-meta"></span></div>
+          <pre class="json" id="result-json">En attente d'une opération...</pre>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer dark"><div class="wrap"><span>Console d'opérations — démo interne (sandbox)</span></div></footer>
+
+  <script src="themes.js"></script>
+  <script src="theme-switcher.js"></script>
+  <script src="site.js"></script>
+  <script src="ops.js"></script>
+  <script>
+    (function () {
+      var r; try { r = JSON.parse(sessionStorage.getItem('pms_reservation') || 'null'); } catch (e) { r = null; }
+      if (!r) return;
+      var t = (window.THEME_BY_KEY && window.THEME_BY_KEY[r.theme]) || {};
+      var slot = document.getElementById('last-slot');
+      slot.innerHTML = '<div class="last" style="--acc:' + (r.accent || '#7fd1b5') + '"><span class="l-em">' + (r.emoji || '💳') + '</span><div><b>Dernier paiement : ' + SITE.esc(r.itemLabel) + '</b><small>' + SITE.esc(t.brand || r.themeName) + ' · ' + SITE.esc(r.themeProduct || '') + ' · ' + SITE.euros(r.amount, r.currency) + ' · ' + SITE.esc((r.shopper && r.shopper.firstName + ' ' + r.shopper.lastName) || '') + '</small></div><code>ref ' + SITE.esc(r.reference || '—') + '</code><span class="hint" style="color:#8ea2b0">Le pspReference arrive par webhook : collez-le dans le champ ci-dessous.</span><a class="btn sm" href="' + SITE.esc(t.page || 'index.html') + '">← ' + SITE.esc(t.brand || 'Retour') + '</a></div>';
+    })();
+  </script>
+</body>
+</html>

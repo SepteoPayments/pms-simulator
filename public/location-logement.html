@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Logement — Maisons du Littoral</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="styles.css" /><link rel="stylesheet" href="ui.css" /><link rel="stylesheet" href="skins.css" />
+<link rel="stylesheet" href="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.68.0/adyen.css" />
+<script src="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.68.0/adyen.js"></script>
+<style>
+  .keyfacts { display: flex; gap: 18px; flex-wrap: wrap; padding: 14px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); font-size: 14.5px; }
+  .keyfacts span { display: inline-flex; align-items: center; gap: 6px; }
+  .rules { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .rules li { display: flex; gap: 10px; align-items: flex-start; font-size: 14.5px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; }
+  .rules li::before { content: '•'; color: var(--accent); font-weight: 900; font-size: 20px; line-height: 1; }
+  .pay-plan { display: grid; gap: 8px; margin-top: 10px; }
+  .pay-plan div { display: grid; grid-template-columns: 26px 1fr auto; gap: 10px; align-items: center; font-size: 13px; padding: 8px 10px; border-radius: 10px; background: var(--bg); }
+  .pay-plan div i { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: 800; color: #fff; background: var(--brand-2); font-style: normal; }
+  .pay-plan div.dep i { background: var(--accent); }
+  .pay-plan div b { font-variant-numeric: tabular-nums; }
+  .pay-plan div small { display: block; color: var(--muted); font-size: 11.5px; }
+  .hostcard { display: flex; gap: 14px; align-items: center; }
+  .hostcard img { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; }
+  .hostcard b { display: block; }
+  .hostcard span { font-size: 12.5px; color: var(--muted); }
+  .guests-pick { display: flex; gap: 6px; flex-wrap: wrap; }
+  .guests-pick button { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 7px 10px; font: inherit; font-size: 13px; cursor: pointer; min-width: 40px; }
+  .guests-pick button.on { border-color: var(--brand); background: color-mix(in srgb, var(--brand) 10%, var(--surface)); font-weight: 700; color: var(--brand); }
+</style>
+</head>
+<body class="theme-location" data-theme-key="location">
+  <header class="topbar">
+    <div class="wrap">
+      <a class="brand" href="location.html"><span class="dot">M</span><span>Maisons du Littoral<small>Conciergerie · Resalys by Septeo</small></span></a>
+      <nav class="nav">
+        <a href="location.html#logements">Logements</a>
+        <a href="location.html#comment">Comment ça marche</a>
+        <a class="cta" href="operations.html">Console d'opérations</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap" id="root"></main>
+
+  <footer class="footer"><div class="wrap"><span>Maisons du Littoral · La Rochelle · démo sandbox</span><span>Resalys — Septeo Hospitality</span></div></footer>
+
+  <script src="themes.js"></script>
+  <script src="theme-switcher.js"></script>
+  <script src="common.js"></script>
+  <script src="checkout.js"></script>
+  <script src="site.js"></script>
+  <script src="data/location.js"></script>
+  <script>
+    (function () {
+      var D = window.DATA_LOC, S = window.SITE, root = document.getElementById('root');
+      var id = S.qs('id') || 'villa';
+      var P = D.properties.filter(function (p) { return p.id === id; })[0];
+      if (!P) { root.innerHTML = '<div class="empty-state" style="margin:60px 0"><div class="e-ico">🏝️</div><h2>Logement introuvable</h2><p><a href="location.html#logements">Retour aux logements</a></p></div>'; return; }
+      document.title = P.name + ' — Maisons du Littoral';
+      var d0 = new Date(); var toSat = (6 - d0.getDay() + 7) % 7 || 7;
+      var st = { in: S.qs('in') || S.today(toSat + 14), out: S.qs('out') || null, guests: Math.min(P.guests, Number(S.qs('guests')) || 4), opts: {}, step: 'deposit' };
+      if (!st.out) st.out = S.addDays(st.in, Math.max(7, P.minNights));
+      function isHigh(iso) { var m = Number(iso.slice(5, 7)); return m === 7 || m === 8 || m === 12 || m === 2; }
+      function nightPrice(iso) { return P.night + (isHigh(iso) ? P.highSeasonPlus : 0); }
+      var booked = []; var seed = P.id.length * 53; for (var k = 1; k < 150; k++) { if (S.rand(seed + k) < 0.12) { booked.push(S.today(k)); if (S.rand(seed + k + 1000) < 0.6) booked.push(S.today(k + 1)); } }
+      var bookedSet = {}; booked.forEach(function (b) { bookedSet[b] = 1; });
+      for (var c = st.in; c < st.out; c = S.addDays(c, 1)) if (bookedSet[c]) { st.in = S.addDays(st.out, 3); st.out = S.addDays(st.in, Math.max(7, P.minNights)); break; }
+      var photos = P.photos.map(function (p) { return { src: p[0], alt: p[1] }; });
+
+      root.innerHTML =
+        '<nav class="crumbs"><a href="index.html">Univers</a><span class="sep">›</span><a href="location.html">Maisons du Littoral</a><span class="sep">›</span><a href="location.html#logements">' + S.esc(P.region) + '</a><span class="sep">›</span><b>' + S.esc(P.name) + '</b></nav>' +
+        '<div class="fiche-head"><div><span class="eyebrow">' + S.esc(P.type) + ' · ' + S.esc(P.badge) + (P.superhost ? ' · ★ Conciergerie Plus' : '') + '</span><h1>' + S.esc(P.name) + '</h1>' +
+          '<div class="sub">' + S.stars(P.rating, P.reviewsCount) + '<span class="dot-sep">📍 ' + S.esc(P.where) + '</span></div></div>' +
+          '<div class="aside"><div class="from">à partir de</div><div class="price-big">' + S.euros(P.night) + ' <small>/ nuit</small></div></div></div>' +
+        '<div id="mosaic"></div>' +
+        '<div class="fiche-grid" style="margin-top:26px">' +
+          '<div class="fiche-main">' +
+            '<div class="keyfacts"><span>👥 ' + P.guests + ' voyageurs</span><span>🛏️ ' + P.bedrooms + ' chambres · ' + P.beds + ' lits</span><span>🛁 ' + P.baths + ' salles de bain</span><span>📐 ' + P.size + ' m²</span><span>🌙 ' + P.minNights + ' nuits min.</span></div>' +
+            '<section data-reveal><h2>' + S.esc(P.tagline) + '</h2><div class="prose"><p>' + S.esc(P.desc) + '</p></div>' +
+              '<div class="hostcard" style="margin-top:14px"><img src="' + D.agency.host.photo + '" alt=""><div><b>Gérée par ' + S.esc(D.agency.host.name) + ' · ' + S.esc(D.agency.name) + '</b><span>Conciergerie depuis ' + D.agency.host.since + ' · ' + S.esc(D.agency.host.response) + ' · accueil en personne</span></div></div></section>' +
+            '<section data-reveal><h2>Équipements</h2><ul class="amen">' + P.amenities.map(function (a) { var l = D.amenityLabels[a]; return '<li><span class="a-ico">' + l[0] + '</span>' + S.esc(l[1]) + '</li>'; }).join('') + '</ul></section>' +
+            '<section data-reveal><h2>Où se trouve le logement</h2><div class="map"><div class="radius" style="--x:' + P.coords[0] + '%;--y:' + P.coords[1] + '%"></div><div class="pin" style="--x:' + P.coords[0] + '%;--y:' + P.coords[1] + '%"><i></i><b>' + S.esc(P.name) + '</b></div>' + P.pois.map(function (p) { return '<div class="pin poi" style="--x:' + p[2] + '%;--y:' + p[3] + '%"><i></i><b>' + S.esc(p[0]) + '</b></div>'; }).join('') + '</div>' +
+              '<div class="chips" style="margin-top:12px">' + P.pois.map(function (p) { return '<span class="chip-t">📍 ' + S.esc(p[0]) + ' · ' + S.esc(p[1]) + '</span>'; }).join('') + '</div><p class="hint" style="margin-top:8px">L’adresse exacte est communiquée après le paiement de l’acompte.</p></section>' +
+            '<section data-reveal><h2>Disponibilités</h2><p class="hint" style="margin:0 0 10px">Haute saison (juillet, août, décembre, février) : +' + S.euros(P.highSeasonPlus) + ' par nuit. Séjour minimum ' + P.minNights + ' nuits.</p><div id="cal"></div></section>' +
+            '<section data-reveal><h2>Options de séjour</h2><div class="options" id="opts"></div></section>' +
+            '<section data-reveal><h2>Règles de la maison</h2><ul class="rules">' + P.rules.map(function (r) { return '<li>' + S.esc(r) + '</li>'; }).join('') + '</ul></section>' +
+            '<section data-reveal><h2>Avis des voyageurs</h2><div class="rating-sum"><div class="big">' + P.rating.toFixed(2) + '</div><div><div>' + S.stars(P.rating) + '</div><div class="hint">' + P.reviewsCount + ' avis vérifiés</div></div><div class="rating-bars"><div>Propreté<i style="--w:98%"></i><span>4.9</span></div><div>Exactitude<i style="--w:96%"></i><span>4.8</span></div><div>Communication<i style="--w:99%"></i><span>5.0</span></div><div>Emplacement<i style="--w:94%"></i><span>4.7</span></div></div></div>' +
+              '<div class="reviews">' + P.reviews.map(function (r) { return '<div class="review"><div class="r-head"><span class="avatar">' + S.esc(r.who[0]) + '</span><div><div class="r-who">' + S.esc(r.who) + '</div><div class="r-meta">' + S.esc(r.from) + ' · ' + S.esc(r.date) + '</div></div><span style="margin-left:auto">' + S.stars(r.rating) + '</span></div><p class="r-txt">' + S.esc(r.text) + '</p></div>'; }).join('') + '</div></section>' +
+            '<section data-reveal><h2>D’autres maisons</h2><div class="cards">' + D.properties.filter(function (p) { return p.id !== P.id; }).map(function (p) { return '<a class="card" href="location-logement.html?id=' + p.id + '&in=' + st.in + '&out=' + st.out + '&guests=' + st.guests + '"><div class="c-photo"><img src="' + p.photos[0][0] + '" alt="" loading="lazy"><div class="badges"><span class="badge acc">' + S.esc(p.badge) + '</span></div></div><div class="c-body"><h3>' + S.esc(p.name) + '</h3><div class="c-meta">📍 ' + S.esc(p.where) + '</div><div class="c-foot"><div class="c-price">' + S.euros(p.night) + '<small>/ nuit</small></div><span class="c-go">Voir</span></div></div></a>'; }).join('') + '</div></section>' +
+          '</div>' +
+          '<aside class="book-card" id="book"></aside>' +
+        '</div>';
+
+      S.mosaic('#mosaic', photos);
+      var cal = S.calendar('#cal', { months: 2, booked: booked, start: st.in, end: st.out, minNights: P.minNights, prices: nightPrice, onChange: function (a, b) { st.in = a; st.out = b; renderBook(); } });
+      document.getElementById('opts').innerHTML = D.options.map(function (o) { return '<label class="option" data-o="' + o.id + '"><input type="checkbox"><span class="o-ico">' + o.ico + '</span><div class="o-main"><div class="o-name">' + S.esc(o.name) + '</div><div class="o-desc">' + S.esc(o.desc) + '</div></div><div class="o-price">' + S.euros(o.price) + ' <small>/ ' + S.esc(o.per) + '</small></div></label>'; }).join('');
+      document.querySelectorAll('.option input').forEach(function (cb) { cb.addEventListener('change', function () { var oid = cb.closest('.option').getAttribute('data-o'); st.opts[oid] = cb.checked; cb.closest('.option').classList.toggle('on', cb.checked); renderBook(); }); });
+
+      function breakdown() {
+        var n = st.out ? S.nights(st.in, st.out) : 0, stay = 0, lines = [];
+        for (var c = st.in; n && c < st.out; c = S.addDays(c, 1)) stay += nightPrice(c);
+        if (n) { lines.push(['Séjour · ' + n + ' nuits', stay]); lines.push(['Ménage de fin de séjour', P.cleaning]); }
+        D.options.forEach(function (o) { if (st.opts[o.id]) lines.push([o.name, o.per === 'pers.' ? o.price * st.guests : o.price]); });
+        var total = lines.reduce(function (s, l) { return s + l[1]; }, 0);
+        var dep = Math.round(total * D.depositRate / 100) * 100;
+        return { n: n, lines: lines, total: total, deposit: dep, balance: total - dep };
+      }
+      function renderBook() {
+        var b = breakdown(), box = document.getElementById('book');
+        var tooShort = b.n && b.n < P.minNights;
+        var dueBalance = S.addDays(st.in, -30);
+        box.innerHTML =
+          '<div class="bc-price"><b>' + S.euros(P.night) + '</b><span>/ nuit · basse saison</span></div>' +
+          '<div class="bc-rating">' + S.stars(P.rating) + '<span>' + P.rating.toFixed(2) + ' · ' + P.reviewsCount + ' avis</span></div>' +
+          '<div class="field-row"><label>Arrivée<input type="date" id="b-in" value="' + st.in + '"></label><label>Départ<input type="date" id="b-out" value="' + (st.out || '') + '"></label></div>' +
+          '<div class="hint" style="margin-bottom:6px">Voyageurs (max ' + P.guests + ')</div><div class="guests-pick" id="gp">' + (function () { var h = ''; for (var g = 1; g <= P.guests; g++) h += '<button type="button" data-g="' + g + '" class="' + (g === st.guests ? 'on' : '') + '">' + g + '</button>'; return h; })() + '</div>' +
+          (b.n ? b.lines.map(function (l) { return '<div class="bc-row"><span class="lab">' + S.esc(l[0]) + '</span><span class="val">' + S.euros(l[1]) + '</span></div>'; }).join('') : '<div class="bc-row"><span class="lab">Choisissez vos dates dans le calendrier</span></div>') +
+          (tooShort ? '<div class="co-err" style="margin-top:8px">Séjour minimum : ' + P.minNights + ' nuits.</div>' : '') +
+          '<div class="bc-total"><span>Total séjour<small>Réglé en 2 fois · caution à part</small></span><span>' + S.euros(b.total) + '</span></div>' +
+          '<div class="pay-plan">' +
+            '<div><i>1</i><div>Acompte 30 % aujourd’hui<small>Bloque le logement</small></div><b>' + S.euros(b.deposit) + '</b></div>' +
+            '<div><i>2</i><div>Solde le ' + S.fmtDate(dueBalance) + '<small>J-30 · rappel par e-mail</small></div><b>' + S.euros(b.balance) + '</b></div>' +
+            '<div class="dep"><i>🔒</i><div>Dépôt de garantie à l’arrivée<small>Pré-autorisé, jamais débité si RAS</small></div><b>' + S.euros(P.deposit) + '</b></div>' +
+          '</div>' +
+          '<div class="actions">' +
+            '<button class="btn accent" id="go-dep" ' + (b.n && !tooShort ? '' : 'disabled') + '>Réserver — acompte ' + S.euros(b.deposit) + '</button>' +
+            '<button class="btn outline" id="go-bal" ' + (b.n && !tooShort ? '' : 'disabled') + '>Régler le solde — ' + S.euros(b.balance) + '</button>' +
+            '<button class="btn ghost" id="go-caution">Déposer la caution — ' + S.euros(P.deposit) + '</button>' +
+          '</div>' +
+          '<div class="how"><b>Démo :</b> les trois boutons déclenchent trois paiements réels (sandbox) : acompte et solde en <b>capture immédiate</b>, caution en <b>pré-autorisation</b>. Dans la vraie vie, Resalys enchaîne ces étapes aux bonnes dates.</div>' +
+          '<div class="pbs-slot" data-pbs="compact"></div>';
+        S.brand();
+        document.getElementById('b-in').onchange = function () { st.in = this.value; if (st.out && st.out <= st.in) st.out = S.addDays(st.in, P.minNights); cal.set(st.in, st.out); renderBook(); };
+        document.getElementById('b-out').onchange = function () { st.out = this.value; if (st.out <= st.in) st.out = S.addDays(st.in, P.minNights); cal.set(st.in, st.out); renderBook(); };
+        box.querySelectorAll('#gp button').forEach(function (bt) { bt.onclick = function () { st.guests = Number(bt.getAttribute('data-g')); renderBook(); }; });
+        var base = [['Logement', P.name + ' · ' + P.where], ['Séjour', S.fmtDate(st.in) + ' → ' + S.fmtDate(st.out) + ' (' + b.n + ' nuits)'], ['Voyageurs', String(st.guests)]];
+        var pre = { property: P.name, checkIn: st.in, checkOut: st.out, guests: String(st.guests) };
+        document.getElementById('go-dep').onclick = function () { PMS.checkout({ mode: 'immediate', amount: b.deposit, itemLabel: 'Acompte 30 % — ' + P.name, summary: base.concat(b.lines.map(function (l) { return [l[0], S.euros(l[1])]; }), [['Total séjour', S.euros(b.total)], ['Acompte réglé maintenant', S.euros(b.deposit)], ['Solde à régler le ' + S.fmtDate(dueBalance), S.euros(b.balance)]]), prefill: pre }); };
+        document.getElementById('go-bal').onclick = function () { PMS.checkout({ mode: 'immediate', amount: b.balance, itemLabel: 'Solde du séjour — ' + P.name, summary: base.concat([['Total séjour', S.euros(b.total)], ['Acompte déjà réglé', S.euros(b.deposit)], ['Solde', S.euros(b.balance)]]), prefill: pre }); };
+        document.getElementById('go-caution').onclick = function () { PMS.checkout({ mode: 'caution', amount: P.deposit, itemLabel: 'Dépôt de garantie — ' + P.name, summary: base.concat([['Empreinte pré-autorisée', S.euros(P.deposit) + ' (non débitée)'], ['Libération', 'sous 48 h après l’état des lieux']]), prefill: pre }); };
+      }
+      renderBook();
+      S.reveal();
+    })();
+  </script>
+</body>
+</html>

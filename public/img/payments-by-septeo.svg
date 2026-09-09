@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 78" role="img" aria-label="Payments by Septeo">
+  <!-- 3 slashes coral -->
+  <g fill="#ef6a44">
+    <path d="M18 14 L30 14 L14 58 L2 58 Z"/>
+    <path d="M36 14 L48 14 L32 58 L20 58 Z"/>
+    <path d="M54 14 L66 14 L50 58 L38 58 Z"/>
+  </g>
+  <!-- wordmark : "payments" hérite de currentColor (navy sur clair, blanc sur sombre) -->
+  <text x="78" y="55" font-family="'Trebuchet MS','Segoe UI',Verdana,sans-serif" font-size="46" font-weight="700" letter-spacing="-1" fill="currentColor">payments</text>
+  <!-- by SEPTEO -->
+  <text x="284" y="70" font-family="'Trebuchet MS','Segoe UI',Verdana,sans-serif" font-size="15" font-weight="600" fill="currentColor" opacity=".85">by <tspan font-weight="800" fill="#ef6a44" opacity="1">SEPTEO</tspan></text>
+</svg>

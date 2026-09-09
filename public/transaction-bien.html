@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Bien — Saint-Jean Immobilier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="styles.css" /><link rel="stylesheet" href="ui.css" /><link rel="stylesheet" href="skins.css" />
+<link rel="stylesheet" href="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.68.0/adyen.css" />
+<script src="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.68.0/adyen.js"></script>
+<style>
+  .keyfacts { display: flex; gap: 22px; flex-wrap: wrap; padding: 16px 0; border-top: 1px solid var(--accent); border-bottom: 1px solid var(--line); font-size: 14px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+  .keyfacts b { color: var(--ink); font-size: 16px; margin-right: 4px; font-family: var(--font-head); text-transform: none; letter-spacing: 0; }
+  .rooms { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .rooms td { padding: 9px 4px; border-bottom: 1px dotted var(--line); }
+  .rooms td:last-child { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; color: var(--brand); }
+  .diag { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+  .diag div { border: 1px solid var(--line); border-radius: 4px; padding: 10px 12px; background: var(--surface); display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px; }
+  .diag div i { width: 10px; height: 10px; border-radius: 50%; margin-top: 5px; flex: none; }
+  .diag div i.ok { background: var(--ok); } .diag div i.warn { background: #e0a020; } .diag div i.muted { background: #cfcac2; }
+  .diag div b { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+  .price-block { text-align: right; }
+  .price-block .p { font-family: var(--font-head); font-size: 34px; color: var(--brand); line-height: 1; }
+  .price-block small { color: var(--muted); font-size: 12.5px; display: block; margin-top: 4px; }
+  .seq-box { background: var(--brand); color: #fff; border-radius: 4px; padding: 16px 18px; margin: 12px 0; }
+  .seq-box .lab { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; opacity: .75; }
+  .seq-box .amt { font-family: var(--font-head); font-size: 30px; color: #ffd28a; margin: 4px 0; }
+  .seq-box small { font-size: 12.5px; opacity: .85; display: block; }
+  .fin-row { display: flex; justify-content: space-between; gap: 10px; font-size: 13.5px; padding: 7px 0; border-bottom: 1px dotted var(--line); }
+  .fin-row b { font-variant-numeric: tabular-nums; }
+  .sched-seq { display: grid; gap: 6px; margin-top: 10px; }
+  .sched-seq div { display: grid; grid-template-columns: 1fr auto; gap: 10px; font-size: 13px; padding: 8px 10px; background: var(--bg); border-radius: 4px; border-left: 3px solid var(--line); }
+  .sched-seq div.hl { border-left-color: var(--accent); background: #f8f1e4; }
+  .sched-seq div small { display: block; color: var(--muted); font-size: 11.5px; }
+  .sched-seq div b { font-variant-numeric: tabular-nums; white-space: nowrap; }
+</style>
+</head>
+<body class="theme-transaction" data-theme-key="transaction">
+  <header class="topbar dark">
+    <div class="wrap">
+      <a class="brand" href="transaction.html"><span class="dot">SJ</span><span>Saint-Jean Immobilier<small>Lyon · SPI Transaction · Modelo by Septeo</small></span></a>
+      <nav class="nav">
+        <a href="transaction.html#biens">Biens</a>
+        <a href="transaction.html#sequestre">Le séquestre</a>
+        <a class="cta" href="operations.html">Console d'opérations</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap" id="root"></main>
+
+  <footer class="footer"><div class="wrap"><span>Saint-Jean Immobilier · 4 rue Saint-Jean, Lyon 5e · démo sandbox</span><span>SPI Transaction · Modelo — Septeo Real Estate</span></div></footer>
+
+  <script src="themes.js"></script>
+  <script src="theme-switcher.js"></script>
+  <script src="common.js"></script>
+  <script src="checkout.js"></script>
+  <script src="site.js"></script>
+  <script src="data/transaction.js"></script>
+  <script>
+    (function () {
+      var D = window.DATA_TR, S = window.SITE, root = document.getElementById('root');
+      var id = S.qs('id') || 'maison-ecully';
+      var P = D.properties.filter(function (p) { return p.id === id; })[0];
+      if (!P) { root.innerHTML = '<div class="empty-state" style="margin:60px 0"><div class="e-ico">🏛️</div><h2>Bien introuvable</h2><p><a href="transaction.html#biens">Retour aux biens</a></p></div>'; return; }
+      document.title = P.name + ' — Saint-Jean Immobilier';
+      var seq = Math.round(P.price * D.sequestreRate), fees = Math.round(P.price * 0.075);
+      var photos = P.photos.map(function (p) { return { src: p[0], alt: p[1] }; });
+      var totalRooms = P.rooms_detail.reduce(function (s, r) { return s + r[1]; }, 0);
+      var signing = S.today(7);
+      function when(w) { return S.fmtDate(S.addDays(signing, Number(w))); }
+
+      root.innerHTML =
+        '<nav class="crumbs"><a href="index.html">Univers</a><span class="sep">›</span><a href="transaction.html">Saint-Jean Immobilier</a><span class="sep">›</span><a href="transaction.html#biens">Biens en vente</a><span class="sep">›</span><b>' + S.esc(P.name) + '</b></nav>' +
+        '<div class="fiche-head"><div><span class="eyebrow">' + S.esc(P.kind) + ' · ' + S.esc(P.badge) + ' · réf. ' + P.ref + '</span><h1>' + S.esc(P.name) + '</h1><div class="sub"><span>📍 ' + S.esc(P.where) + '</span><span class="dot-sep">' + S.esc(P.mandate) + '</span><span class="dot-sep">' + P.visits + ' visites · ' + P.offers + ' offre(s)</span></div></div>' +
+          '<div class="price-block"><div class="p">' + S.eurosInt(P.price) + '</div><small>' + S.esc(P.fees) + ' · ' + Math.round(P.price / P.size / 100).toLocaleString('fr-FR') + ' €/m²</small></div></div>' +
+        '<div id="mosaic"></div>' +
+        '<div class="fiche-grid" style="margin-top:26px">' +
+          '<div class="fiche-main">' +
+            '<div class="keyfacts"><span><b>' + P.size + '</b> m²</span><span><b>' + P.rooms + '</b> pièces</span><span><b>' + P.bedrooms + '</b> chambres</span><span><b>' + P.baths + '</b> sdb</span>' + (P.land ? '<span><b>' + P.land + '</b> m² terrain</span>' : '<span><b>' + S.esc(P.floor) + '</b></span>') + '<span><b>' + P.built + '</b> · rénové ' + P.renovated + '</span></div>' +
+            '<section data-reveal><h2>' + S.esc(P.tagline) + '</h2><div class="prose"><p>' + S.esc(P.desc) + '</p></div></section>' +
+            '<section data-reveal><div class="grid-2"><div><h2>Surfaces par pièce</h2><table class="rooms">' + P.rooms_detail.map(function (r) { return '<tr><td>' + S.esc(r[0]) + '</td><td>' + r[1] + ' m²</td></tr>'; }).join('') + '<tr><td><b>Total (dont annexes)</b></td><td>' + totalRooms + ' m²</td></tr></table></div>' +
+              '<div><h2>Prestations</h2><ul class="perks">' + P.features.map(function (f) { return '<li>' + S.esc(f) + '</li>'; }).join('') + '</ul></div></div></section>' +
+            '<section data-reveal><h2>Diagnostics techniques</h2><div class="grid-2" style="grid-template-columns: 340px 1fr; align-items:start"><div><h3 style="margin:0 0 8px;font-size:14px">Performance énergétique</h3><div class="dpe">' + D.dpeScale.map(function (d) { return '<div class="' + (d[0] === P.dpe ? 'on' : '') + '" style="--w:' + d[2] + '%;--c:' + d[1] + '" data-val="' + P.dpeVal + '"><i>' + d[0] + '</i></div>'; }).join('') + '</div><p class="hint" style="margin-top:8px">Émissions GES : classe <b>' + P.ges + '</b>. Diagnostic réalisé le ' + S.fmtDate(S.today(-40)) + ', valable 10 ans.</p></div>' +
+              '<div class="diag">' + P.diagnostics.map(function (d) { return '<div><i class="' + d[2] + '"></i><div><b>' + S.esc(d[0]) + '</b>' + S.esc(d[1]) + '</div></div>'; }).join('') + '</div></div></section>' +
+            '<section data-reveal><h2>Situation</h2><div class="map"><div class="radius" style="--x:52%;--y:50%"></div><div class="pin" style="--x:52%;--y:50%"><i></i><b>' + S.esc(P.where) + '</b></div><div class="pin poi" style="--x:30%;--y:30%"><i></i><b>Écoles</b></div><div class="pin poi" style="--x:72%;--y:38%"><i></i><b>Commerces</b></div><div class="pin poi" style="--x:64%;--y:74%"><i></i><b>Transports</b></div><div class="pin poi" style="--x:22%;--y:70%"><i></i><b>Parc</b></div></div><p class="hint" style="margin-top:8px">Adresse exacte communiquée après la première visite.</p></section>' +
+            '<section data-reveal><h2>Les étapes de la vente</h2><ul class="timeline">' + P.steps.map(function (s) { return '<li class="' + (s.done ? 'done' : s.now ? 'now' : '') + '"><span class="t-dot">' + (s.done ? '✓' : s.now ? '●' : '') + '</span><div><div class="t-title">' + S.esc(s.t) + '</div><div class="t-desc">' + S.esc(s.d) + '</div></div><span class="t-date">' + when(s.when) + '</span></li>'; }).join('') + '</ul></section>' +
+            '<section data-reveal><h2>Documents du dossier</h2><div class="docs">' + [['Compromis de vente (projet)', 'PDF · 38 pages · préparé par Me Dubois', 'PDF'], ['Dossier de diagnostics techniques (DDT)', 'PDF · 112 pages', 'DDT'], ['Titre de propriété', 'PDF · 14 pages', 'PDF'], ['Plans', 'PDF · échelle 1/100', 'PLAN'], ['Taxe foncière ' + (new Date().getFullYear() - 1), 'PDF · ' + S.euros(P.tax) + ' / an', 'PDF']].concat(P.land ? [] : [['Règlement de copropriété & 3 derniers PV d’AG', 'PDF · charges ' + S.euros(P.charges) + ' / mois', 'PDF']]).map(function (d) { return '<div class="doc"><span class="d-ico">' + d[2] + '</span><div class="d-main"><div class="d-name">' + d[0] + '</div><div class="d-meta">' + d[1] + '</div></div><button class="dl" onclick="SITE.toast(\'Téléchargement (démo)\',\'ok\')">⬇ Télécharger</button></div>'; }).join('') + '</div></section>' +
+            '<section data-reveal><h2>Vos interlocuteurs</h2><div class="grid-2"><div class="person"><img src="' + D.agency.agent.photo + '" alt=""><div><div class="p-name">' + S.esc(D.agency.agent.name) + '</div><div class="p-role">' + S.esc(D.agency.agent.role) + '</div><div class="p-contact">' + D.agency.agent.phone + ' · ' + S.esc(D.agency.address) + '</div></div></div><div class="person"><img src="' + D.notary.photo + '" alt=""><div><div class="p-name">' + S.esc(D.notary.name) + '</div><div class="p-role">' + S.esc(D.notary.office) + '</div><div class="p-contact">' + S.esc(D.notary.address) + ' · ' + D.notary.crpcen + '</div></div></div></div></section>' +
+            '<section data-reveal><h2>Ils ont acheté dans le quartier</h2><div class="reviews">' + P.reviews.map(function (r) { return '<div class="review"><div class="r-head"><span class="avatar">' + S.esc(r.who[0]) + '</span><div><div class="r-who">' + S.esc(r.who) + '</div><div class="r-meta">' + S.esc(r.date) + '</div></div><span style="margin-left:auto">' + S.stars(r.rating) + '</span></div><p class="r-txt">' + S.esc(r.text) + '</p></div>'; }).join('') + '</div></section>' +
+            '<section data-reveal><h2>Autres biens</h2><div class="cards">' + D.properties.filter(function (p) { return p.id !== P.id; }).map(function (p) { return '<a class="card" href="transaction-bien.html?id=' + p.id + '"><div class="c-photo"><img src="' + p.photos[0][0] + '" alt="" loading="lazy"><div class="badges"><span class="badge acc">' + S.esc(p.badge) + '</span></div></div><div class="c-body"><h3>' + S.esc(p.name) + '</h3><div class="c-meta">' + S.esc(p.where) + ' · ' + p.size + ' m²</div><div class="c-foot"><div class="c-price">' + S.eurosInt(p.price) + '</div><span class="c-go">Voir</span></div></div></a>'; }).join('') + '</div></section>' +
+          '</div>' +
+          '<aside class="book-card" id="book">' +
+            '<div class="bc-price"><b>' + S.eurosInt(P.price) + '</b></div><div class="hint">' + S.esc(P.fees) + '</div>' +
+            '<div class="seq-box"><div class="lab">Séquestre au compromis · 5 %</div><div class="amt">' + S.eurosInt(seq) + '</div><small>Consigné chez ' + S.esc(D.notary.name) + ', imputé sur le prix à l’acte. Remboursé intégralement en cas de rétractation (10 jours).</small></div>' +
+            '<div class="fin-row"><span>Frais de notaire estimés (7,5 %)</span><b>' + S.eurosInt(fees) + '</b></div>' +
+            '<div class="fin-row"><span>Taxe foncière</span><b>' + S.euros(P.tax) + ' / an</b></div>' +
+            (P.charges ? '<div class="fin-row"><span>Charges de copropriété</span><b>' + S.euros(P.charges) + ' / mois</b></div>' : '') +
+            '<div class="fin-row"><span>Coût total acquisition</span><b>' + S.eurosInt(P.price + fees) + '</b></div>' +
+            '<div class="hint" style="margin-top:12px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;font-size:11px">Échéancier des versements</div>' +
+            '<div class="sched-seq"><div class="hl"><div>Séquestre 5 %<small>Compromis · ' + S.fmtDate(signing) + ' · en ligne</small></div><b>' + S.eurosInt(seq) + '</b></div><div><div>Frais de notaire<small>À l’acte · virement</small></div><b>' + S.eurosInt(fees) + '</b></div><div><div>Solde du prix<small>À l’acte · ' + when(P.steps[P.steps.length - 1].when) + ' · déblocage du prêt</small></div><b>' + S.eurosInt(P.price - seq) + '</b></div></div>' +
+            '<div class="actions"><button class="btn accent" id="go-seq">Verser le séquestre — ' + S.eurosInt(seq) + '</button><button class="btn outline" onclick="SITE.toast(\'Demande de visite envoyée à Claire Fontanel (démo)\',\'ok\')">Demander une visite</button></div>' +
+            '<div class="how"><b>Gros montant, paiement immédiat.</b> Le virement traditionnel prend 2 à 3 jours ; ici le séquestre est versé et rapproché dans le dossier de vente le jour du compromis, avec l’identité de l’acquéreur et la référence du mandat.</div>' +
+            '<div class="pbs-slot" data-pbs="compact"></div>' +
+          '</aside>' +
+        '</div>';
+
+      S.mosaic('#mosaic', photos);
+      S.brand();
+      document.getElementById('go-seq').onclick = function () {
+        PMS.checkout({ mode: 'immediate', amount: seq, itemLabel: 'Séquestre 5 % — ' + P.name, summary: [['Bien', P.name + ' · ' + P.where], ['Prix de vente', S.eurosInt(P.price)], ['Séquestre 5 %', S.eurosInt(seq)], ['Consigné chez', D.notary.name + ' — ' + D.notary.office], ['Compromis', S.fmtDate(signing, true)], ['Mandat', P.ref]], prefill: { propertyRef: P.ref, notaryRef: D.notary.name + ' — Lyon', signingDate: signing } });
+      };
+      S.reveal();
+    })();
+  </script>
+</body>
+</html>

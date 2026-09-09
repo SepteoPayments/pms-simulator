@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hôtel Le Rivage — Cassis · Chambres & suites vue mer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap">
+<link rel="stylesheet" href="styles.css" /><link rel="stylesheet" href="ui.css" /><link rel="stylesheet" href="skins.css" />
+<link rel="stylesheet" href="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.68.0/adyen.css" />
+<script src="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.68.0/adyen.js"></script>
+<style>
+  .h-hero { min-height: 82vh; display: flex; align-items: center; }
+  .h-hero .inner { padding: 70px 0 110px; }
+  .h-hero h1 { font-size: clamp(38px, 6vw, 72px); max-width: 16ch; }
+  .h-hero .stars-row { color: var(--accent); letter-spacing: 4px; font-size: 18px; margin-bottom: 10px; }
+  .searchbar { position: relative; z-index: 3; margin: -64px auto 0; max-width: 1000px; background: var(--surface); border-radius: 8px; box-shadow: 0 24px 60px rgba(20,50,79,.22); display: grid; grid-template-columns: 1fr 1fr 1fr auto; overflow: hidden; border: 1px solid var(--line); }
+  .searchbar label { display: flex; flex-direction: column; gap: 4px; padding: 16px 20px; border-right: 1px solid var(--line); font-size: 11px; text-transform: uppercase; letter-spacing: .14em; color: var(--muted); font-weight: 600; }
+  .searchbar input, .searchbar select { border: none; font: inherit; font-size: 16px; color: var(--ink); background: transparent; padding: 0; outline: none; font-family: var(--font-body); font-weight: 500; }
+  .searchbar button { border: none; background: var(--brand); color: #fff; font: inherit; font-weight: 500; text-transform: uppercase; letter-spacing: .1em; font-size: 13px; padding: 0 30px; cursor: pointer; transition: background .15s; }
+  .searchbar button:hover { background: var(--accent); }
+  @media (max-width: 800px) { .searchbar { grid-template-columns: 1fr 1fr; margin-top: -30px; } .searchbar button { grid-column: 1 / -1; padding: 16px; } }
+  .rooms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 26px; }
+  .room-card .c-photo { aspect-ratio: 4/3; }
+  .room-card .c-specs { display: flex; gap: 12px; font-size: 12.5px; color: var(--muted); flex-wrap: wrap; }
+  .room-card .c-specs span::before { content: attr(data-ico); margin-right: 4px; }
+  .svc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+  .svc { position: relative; border-radius: 8px; overflow: hidden; aspect-ratio: 4/3; color: #fff; display: flex; align-items: flex-end; text-decoration: none; }
+  .svc img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .7s ease; }
+  .svc:hover img { transform: scale(1.06); }
+  .svc::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 40%, rgba(20,50,79,.85)); }
+  .svc .s-body { position: relative; padding: 16px; z-index: 1; }
+  .svc .s-body b { display: block; font-family: var(--font-head); font-size: 20px; font-weight: 600; }
+  .svc .s-body span { font-size: 12.5px; opacity: .85; }
+  .svc .s-ico { position: absolute; top: 12px; left: 12px; background: rgba(255,255,255,.9); color: var(--brand); width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-size: 16px; z-index: 1; }
+  .folio { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 22px 26px; }
+  .folio h3 { margin: 0 0 4px; font-size: 24px; color: var(--brand); }
+  .folio .f-meta { color: var(--muted); font-size: 13px; margin-bottom: 14px; }
+  .folio ul { list-style: none; margin: 0; padding: 0; }
+  .folio li { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px dashed var(--line); font-size: 14.5px; }
+  .folio li span:last-child { font-variant-numeric: tabular-nums; font-weight: 600; }
+  .folio .f-total { display: flex; justify-content: space-between; padding: 14px 0 6px; font-size: 20px; font-weight: 700; color: var(--brand); font-family: var(--font-head); }
+  .folio .f-total b { font-size: 26px; }
+  .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .flow .st { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 18px; position: relative; }
+  .flow .st::before { content: attr(data-n); position: absolute; top: -12px; left: 16px; background: var(--accent); color: #fff; font-family: var(--font-head); font-weight: 700; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: 14px; }
+  .flow .st b { display: block; font-family: var(--font-head); font-size: 19px; margin: 6px 0 4px; color: var(--brand); }
+  .flow .st span { font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .flow .st .mode { display: inline-block; margin-top: 10px; font-size: 10.5px; text-transform: uppercase; letter-spacing: .1em; font-weight: 700; color: var(--accent-ink); background: #f3e9dc; padding: 3px 8px; border-radius: 3px; }
+  @media (max-width: 900px) { .flow { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .flow { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body class="theme-hotel" data-theme-key="hotel">
+  <header class="topbar dark">
+    <div class="wrap">
+      <a class="brand" href="hotel.html"><span class="dot">R</span><span>Hôtel Le Rivage<small>Cassis · ★★★★ · Asterio by Septeo</small></span></a>
+      <nav class="nav">
+        <a href="#chambres">Chambres</a>
+        <a href="#services">Services</a>
+        <a href="#note">Ma note</a>
+        <a class="cta" href="operations.html">Console d'opérations</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero h-hero">
+    <div class="bg" style="background-image:url('img/hotel-hero.jpg')"></div>
+    <div class="scrim"></div>
+    <div class="wrap inner">
+      <div class="stars-row">★★★★</div>
+      <span class="eyebrow" style="color:#e8c9a3">Cassis · Bord de mer · Depuis 1927</span>
+      <h1>Une chambre face aux calanques</h1>
+      <p>À la réservation, l’hôtel <strong>pré-autorise une empreinte d’une nuit</strong> — rien n’est débité. Vous réglez votre <strong>note au départ</strong>, extras compris. C’est le PMS Asterio qui orchestre tout, avec Payments by Septeo.</p>
+      <div class="pills"><span class="pill">Garantie sans débit</span><span class="pill">Note réglée au check-out</span><span class="pill">Annulation 48 h</span><span class="pill">Piscine chauffée</span></div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <form class="searchbar" id="search">
+      <label>Arrivée<input type="date" name="in" id="s-in"></label>
+      <label>Départ<input type="date" name="out" id="s-out"></label>
+      <label>Voyageurs<select name="guests" id="s-guests"><option value="1">1 adulte</option><option value="2" selected>2 adultes</option><option value="3">2 adultes · 1 enfant</option><option value="4">2 adultes · 2 enfants</option></select></label>
+      <button type="submit">Voir les disponibilités</button>
+    </form>
+  </div>
+
+  <main class="wrap">
+    <section class="section" id="chambres">
+      <div class="sec-head">
+        <div><span class="eyebrow">Chambres & suites</span><h2>Quatre façons d’habiter le Rivage</h2><p class="lead" id="rooms-lead">Sélectionnez une chambre pour découvrir sa fiche : photos, équipements, disponibilités et prix selon vos dates.</p></div>
+        <span class="badge soft" id="s-summary">2 nuits · 2 voyageurs</span>
+      </div>
+      <div class="rooms-grid" id="rooms"></div>
+    </section>
+
+    <section class="section" id="flow-sec">
+      <span class="eyebrow">Comment ça marche</span>
+      <h2>Un seul parcours, trois moments de paiement</h2>
+      <p class="lead">Le PMS déclenche le bon type d’opération à chaque étape du séjour, sur la même API Payments by Septeo.</p>
+      <div class="flow">
+        <div class="st" data-n="1" data-reveal style="--i:0"><b>Réservation</b><span>Empreinte d’une nuit pré-autorisée sur la carte. Aucun débit, la chambre est garantie.</span><span class="mode">Caution · pré-autorisation</span></div>
+        <div class="st" data-n="2" data-reveal style="--i:1"><b>Séjour</b><span>Petit-déjeuner, bar, spa, room service : chaque extra s’ajoute à la note dans Asterio.</span><span class="mode">Note ouverte</span></div>
+        <div class="st" data-n="3" data-reveal style="--i:2"><b>Départ</b><span>La note est capturée en une fois. L’empreinte est ajustée au montant réel, puis libérée.</span><span class="mode">Capture · ajustement</span></div>
+        <div class="st" data-n="4" data-reveal style="--i:3"><b>Après</b><span>Remboursement partiel, no-show, litige : tout se pilote dans la console d’opérations.</span><span class="mode">Refund · cancel</span></div>
+      </div>
+    </section>
+
+    <section class="section" id="services">
+      <div class="sec-head"><div><span class="eyebrow">La maison</span><h2>Services & plaisirs de l’hôtel</h2></div></div>
+      <div class="svc-grid" id="services-grid"></div>
+    </section>
+
+    <section class="section" id="note">
+      <div class="grid-2">
+        <div>
+          <span class="eyebrow">Au moment du départ</span>
+          <h2>Régler ma note</h2>
+          <p class="lead">Exemple de note en fin de séjour : l’hébergement, la taxe de séjour et les extras consommés. Un seul paiement capture le tout ; l’empreinte de garantie est ensuite libérée.</p>
+          <div class="chips" style="margin-bottom:16px"><span class="chip-t">Chambre 204 · Supérieure Vue Mer</span><span class="chip-t">Arrivée <b id="f-in"></b></span><span class="chip-t">Départ <b id="f-out"></b></span><span class="chip-t acc">Empreinte 215,00 € à libérer</span></div>
+          <p class="hint">Astuce démo : après ce paiement, ouvrez la <a href="operations.html">console d’opérations</a> pour capturer, ajuster ou rembourser avec le pspReference reçu par webhook.</p>
+        </div>
+        <div class="folio" data-reveal>
+          <h3>Note de séjour n° 26-0912</h3>
+          <div class="f-meta">Hôtel Le Rivage · Chambre 204 · 2 adultes · Charles Vidal</div>
+          <ul id="folio"></ul>
+          <div class="f-total"><span>Total à régler</span><b id="folio-total"></b></div>
+          <button class="btn accent block" id="pay-folio">Régler la note au départ</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="dt-band" data-reveal>
+        <div>
+          <span class="eyebrow" style="color:#e8c9a3">Data travel</span>
+          <h2>Les données du client voyagent avec le paiement</h2>
+          <p>Nom, e-mail, dates de séjour, motif du voyage, nombre de voyageurs… collectés dans le parcours, transmis avec le paiement et exploitables ensuite : taux de no-show par segment, panier moyen loisir vs affaires, extras préférés des familles.</p>
+          <div data-pbs></div>
+        </div>
+        <div class="dt-json" id="dt-json"></div>
+      </div>
+    </section>
+
+    <section class="section"><p class="note">Démo sandbox — carte de test <strong>4111 1111 1111 1111</strong> · 03/30 · 737. Capture de la garantie, ajustement ou remboursement dans la <a href="operations.html">console d'opérations</a>.</p></section>
+  </main>
+
+  <footer class="footer"><div class="wrap"><span>Hôtel Le Rivage · 12 quai des Baux, 13260 Cassis · démo sandbox</span><span>PMS Asterio · Ulyses — Septeo Hospitality</span></div></footer>
+
+  <script src="themes.js"></script>
+  <script src="theme-switcher.js"></script>
+  <script src="common.js"></script>
+  <script src="checkout.js"></script>
+  <script src="site.js"></script>
+  <script src="data/hotel.js"></script>
+  <script>
+    (function () {
+      var D = window.DATA_HOTEL, S = window.SITE;
+      // --- dates par défaut : vendredi prochain → dimanche
+      var inEl = document.getElementById('s-in'), outEl = document.getElementById('s-out'), gEl = document.getElementById('s-guests');
+      var qin = S.qs('in'), qout = S.qs('out'), qg = S.qs('guests');
+      var d0 = new Date(); var toFri = (5 - d0.getDay() + 7) % 7 || 7; var start = S.today(toFri + 7);
+      inEl.value = qin || start; outEl.value = qout || S.addDays(inEl.value, 2); if (qg) gEl.value = qg;
+      inEl.min = S.today(0);
+
+      function isWeekend(iso) { var d = new Date(iso + 'T12:00:00').getDay(); return d === 5 || d === 6; }
+      function stayPrice(room, a, b) { var t = 0; for (var c = a; c < b; c = S.addDays(c, 1)) t += room.night + (isWeekend(c) ? room.weekendPlus : 0); return t; }
+
+      function render() {
+        var a = inEl.value, b = outEl.value, n = S.nights(a, b), g = Number(gEl.value);
+        if (n < 1) { outEl.value = S.addDays(a, 1); return render(); }
+        document.getElementById('s-summary').textContent = n + ' nuit' + (n > 1 ? 's' : '') + ' · ' + g + ' voyageur' + (g > 1 ? 's' : '') + ' · du ' + S.fmtDate(a) + ' au ' + S.fmtDate(b);
+        var host = document.getElementById('rooms'); host.innerHTML = '';
+        D.rooms.forEach(function (r, i) {
+          var total = stayPrice(r, a, b), full = r.capacity < g;
+          var link = 'hotel-chambre.html?id=' + r.id + '&in=' + a + '&out=' + b + '&guests=' + g;
+          var el = document.createElement('a'); el.className = 'card room-card'; el.href = link; el.setAttribute('data-reveal', ''); el.style.setProperty('--i', i);
+          el.innerHTML =
+            '<div class="c-photo"><img src="' + r.photos[0][0] + '" alt="' + S.esc(r.name) + '" loading="lazy"><div class="badges"><span class="badge acc">' + S.esc(r.badge) + '</span>' + (full ? '<span class="badge warn">Capacité ' + r.capacity + ' pers.</span>' : '') + '</div><span class="c-count">📷 ' + r.photos.length + ' photos</span></div>' +
+            '<div class="c-body"><div class="c-title"><h3>' + S.esc(r.name) + '</h3></div>' +
+            '<div class="c-specs"><span data-ico="📐">' + r.size + ' m²</span><span data-ico="👥">' + r.capacity + ' pers.</span><span data-ico="🛏️">' + S.esc(r.beds.split(' + ')[0]) + '</span></div>' +
+            '<div class="c-meta">' + S.stars(r.rating, r.reviewsCount) + '</div>' +
+            '<p class="c-desc">' + S.esc(r.tagline) + ' — ' + S.esc(r.view) + ', ' + S.esc(r.exposure.toLowerCase()) + '.</p>' +
+            '<div class="c-foot"><div class="c-price">' + S.euros(total) + '<small>' + n + ' nuit' + (n > 1 ? 's' : '') + ' · dès ' + S.euros(r.night) + '/nuit</small></div><span class="c-go">Voir la chambre</span></div></div>';
+          host.appendChild(el);
+        });
+        S.reveal();
+        document.getElementById('f-in').textContent = S.fmtDate(a); document.getElementById('f-out').textContent = S.fmtDate(b);
+        renderJson(a, b, g);
+      }
+      document.getElementById('search').addEventListener('submit', function (e) { e.preventDefault(); render(); document.getElementById('chambres').scrollIntoView({ behavior: 'smooth' }); });
+      [inEl, outEl, gEl].forEach(function (el) { el.addEventListener('change', render); });
+
+      // services
+      document.getElementById('services-grid').innerHTML = D.services.map(function (s, i) {
+        return '<a class="svc" href="#" data-reveal style="--i:' + i + '" onclick="return false"><img src="' + s.img + '" alt="" loading="lazy"><span class="s-ico">' + s.ico + '</span><div class="s-body"><b>' + S.esc(s.name) + '</b><span>' + S.esc(s.desc) + '</span></div></a>';
+      }).join('');
+
+      // note de séjour
+      var total = 0; document.getElementById('folio').innerHTML = D.folio.map(function (l) { total += l[1]; return '<li><span>' + S.esc(l[0]) + '</span><span>' + S.euros(l[1]) + '</span></li>'; }).join('');
+      document.getElementById('folio-total').textContent = S.euros(total);
+      document.getElementById('pay-folio').onclick = function () {
+        PMS.checkout({ mode: 'immediate', amount: total, itemLabel: 'Note de séjour n° 26-0912 — Chambre 204', summary: D.folio.map(function (l) { return [l[0], S.euros(l[1])]; }), prefill: { checkIn: inEl.value, checkOut: outEl.value, guests: gEl.value, room: '204 · Supérieure Vue Mer' } });
+      };
+
+      // data travel
+      function renderJson(a, b, g) {
+        var j = { shopper: { firstName: 'Charles', lastName: 'Vidal', email: 'charles.vidal@example.fr', dateOfBirth: '1985-04-12', billingAddress: { city: 'Lyon', country: 'FR' } }, metadata: { vertical: 'hotel', checkIn: a, checkOut: b, nights: S.nights(a, b), guests: g, purpose: 'Loisir', room: 'Supérieure Vue Mer', loyalty: 'Gold' } };
+        document.getElementById('dt-json').innerHTML = JSON.stringify(j, null, 2).replace(/"([^"]+)":/g, '<span class="k">"$1"</span>:').replace(/: "([^"]*)"/g, ': <span class="s">"$1"</span>').replace(/: (\d+)/g, ': <span class="n">$1</span>');
+      }
+      render();
+    })();
+  </script>
+</body>
+</html>
