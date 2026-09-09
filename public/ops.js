@@ -14,6 +14,8 @@
       hook: 'Webhook AUTHORISATION &rarr; <b>additionalData.recurring.shopperReference</b> (ou shopperReference racine).' },
     recurringModel: { label: 'Modele de recurrence', type: 'select', options: ['UNSCHEDULED', 'SUBSCRIPTION', 'CARD_ON_FILE'],
       hook: 'Doit correspondre au modele utilise lors de la tokenisation.' },
+    orderPspReference: { label: 'orderPspReference (order composite)', ph: '883612345678ORDR',
+      hook: 'Webhook <b>ORDER_CLOSED</b> &rarr; champ <b>pspReference</b> (racine). Relie les jambes ANCV + carte d\'un meme achat.' },
   };
 
   var OPS = [
@@ -25,6 +27,8 @@
       desc: 'POST /payments/{pspReference}/cancels - annule une autorisation NON encore capturee (avant capture). Webhook <b>CANCELLATION</b>.' },
     { op: 'reversal', label: 'Reversal', fields: ['pspReference'],
       desc: 'POST /payments/{pspReference}/reversals - undo intelligent : annule si pas capture, sinon rembourse.' },
+    { op: 'order-reversal', label: 'Annuler un order (ANCV+CB)', fields: ['orderPspReference'],
+      desc: 'POST /orders/{orderPspReference}/reversals - annule un order <b>composite</b> (ex. ANCV + carte) en inversant CHAQUE jambe. Reponse <b>par jambe</b> (voir <code>legs</code>) : <code>status</code> global RECEIVED / PARTIAL / FAILED. La jambe ANCV n\'est reversable que dans les 4h ; sinon elle ressort REFUSED pendant que la carte est bien inversee.' },
     { op: 'refund', label: 'Rembourser', fields: ['pspReference', 'amount'],
       desc: 'POST /payments/{pspReference}/refunds - remboursement total ou partiel d\'un paiement capture. Webhook <b>REFUND</b>.' },
     { op: 'adjust', label: 'Ajuster le montant', fields: ['pspReference', 'amount'],
@@ -74,6 +78,7 @@
     current.fields.forEach(function (k) { payload[k] = val(k); });
     // validations minimales
     if (current.fields.indexOf('pspReference') >= 0 && !payload.pspReference) return show(0, { error: 'pspReference requis (voir webhook AUTHORISATION).' });
+    if (current.fields.indexOf('orderPspReference') >= 0 && !payload.orderPspReference) return show(0, { error: 'orderPspReference requis (voir webhook ORDER_CLOSED).' });
     if (current.fields.indexOf('amount') >= 0 && !payload.amount) return show(0, { error: 'Montant requis (en centimes).' });
 
     var bar = document.getElementById('result-bar'); bar.style.display = 'none';

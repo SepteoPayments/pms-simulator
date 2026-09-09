@@ -116,6 +116,7 @@ async function operation(p) {
     case 'refund':   return apiCall('POST', '/payments/' + enc(ref) + '/refunds', { amount: money, publicStoreId: store });
     case 'cancel':   return apiCall('POST', '/payments/' + enc(ref) + '/cancels', { publicStoreId: store });
     case 'reversal': return apiCall('POST', '/payments/' + enc(ref) + '/reversals', { publicStoreId: store });
+    case 'order-reversal': return apiCall('POST', '/orders/' + enc(p.orderPspReference) + '/reversals', { publicStoreId: store });
     case 'adjust':   return apiCall('POST', '/payments/' + enc(ref) + '/amount', { amount: money, publicStoreId: store });
     case 'extend':   return apiCall('POST', '/payments/' + enc(ref) + '/extend', { amount: money, publicStoreId: store, reason: p.reason || null });
     case 'mit':      return apiCall('POST', '/payments', { amount: money, publicStoreId: store, token: p.token, shopperReference: p.shopperReference, recurringModel: p.recurringModel || 'UNSCHEDULED', reference: 'sim-mit-' + Date.now() });
