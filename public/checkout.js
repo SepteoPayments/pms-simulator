@@ -115,6 +115,13 @@
   };
   var NOUN = { hotel: 'Réservation', camping: 'Réservation', spa: 'Réservation', location: 'Réservation', gestion: 'Paiement', syndic: 'Paiement', transaction: 'Versement', resto: 'Réservation' };
   var MODE_LABEL = { immediate: ['Paiement immédiat', 'Le montant est capturé tout de suite.'], caution: ['Empreinte de garantie', 'Pré-autorisation : rien n’est débité, le montant est gelé puis capturé ou libéré.'], mandate: ['Mandat de prélèvement', 'Le moyen de paiement est enregistré pour les échéances à venir (paiement initial de référence).'] };
+  // Traduction "intention métier" (mode, interne au simulateur) -> vrais champs de l'API /sessions.
+  // Miroir de config.js (paymentModes) côté backend : l'API publique ne connaît PAS "mode", elle prend capture.mode + preAuth + tokenization.
+  var MODE_SESSION = {
+    immediate: { capture: { mode: 'IMMEDIATE' }, preAuth: false, tokenization: null },
+    caution:   { capture: { mode: 'MANUAL' },    preAuth: true,  tokenization: null },
+    mandate:   { capture: { mode: 'IMMEDIATE' }, preAuth: false, tokenization: { recurringModel: 'SUBSCRIPTION', consentMode: 'ASK_FOR_CONSENT' } }
+  };
 
   var PBS_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 78" role="img" aria-label="Payments by Septeo" class="pbs-logo"><g fill="#ef6a44"><path d="M18 14 L30 14 L14 58 L2 58 Z"/><path d="M36 14 L48 14 L32 58 L20 58 Z"/><path d="M54 14 L66 14 L50 58 L38 58 Z"/></g><text x="78" y="55" font-family="\'Trebuchet MS\',\'Segoe UI\',Verdana,sans-serif" font-size="46" font-weight="700" letter-spacing="-1" fill="currentColor">payments</text><text x="284" y="70" font-family="\'Trebuchet MS\',\'Segoe UI\',Verdana,sans-serif" font-size="15" font-weight="600" fill="currentColor" opacity=".85">by <tspan font-weight="800" fill="#ef6a44" opacity="1">SEPTEO</tspan></text></svg>';
 
@@ -187,7 +194,7 @@
               '</select></div>' +
             '<p class="co-consent-note">ℹ️ Étape paramétrable par l’API (<code>consentMode</code>). En <b>Imposé</b> la case disparaît : vous pouvez la désactiver et gérer les mandats vous-même côté PMS (envoi, signature, archivage). Le texte du mandat SEPA reste affiché par le prestataire dans tous les cas.</p>' +
           '</div>' : '') +
-        '<details class="co-travel"><summary>👁️ Aperçu des données qui voyagent avec le paiement</summary><pre class="co-json"></pre></details>' +
+        '<details class="co-travel"><summary>👁️ Aperçu — payload de session (API) + données qui voyagent</summary><pre class="co-json"></pre></details>' +
         '<div class="co-err" hidden></div>' +
         '<button type="submit" class="btn block co-pay" style="background:' + theme.accent + '">Procéder au paiement — ' + euros(amount, currency) + '</button>' +
         '<p class="co-legal">Démo sandbox — aucune donnée réelle. Les infos client « voyagent » avec le paiement (voir Data Travel) et alimentent les statistiques par type de client.</p>' +
@@ -206,8 +213,21 @@
       var pre = bodyEl.querySelector('.co-json'); if (!pre) return;
       var data = collect();
       var p = buildPayload(data);
-      var preview = { amount: { value: amount, currency: currency }, mode: mode, shopper: p.shopper, metadata: p.metadata };
-      if (mode === 'mandate') preview.consentMode = data.consentMode || 'ASK_FOR_CONSENT';
+      var s = MODE_SESSION[mode] || MODE_SESSION.immediate;
+      // Ce que reçoit réellement l'API publique POST /sessions (le "mode" est traduit ici en capture.mode + preAuth).
+      // publicStoreId / reference / returnUrl sont ajoutés par le backend du simulateur.
+      var sessionPayload = {
+        amount: { value: amount, currency: currency },
+        capture: s.capture,
+        preAuth: s.preAuth,
+        tokenization: s.tokenization
+          ? { shopperReference: 'cust-' + (data.email || 'demo'), recurringModel: s.tokenization.recurringModel, consentMode: (mode === 'mandate' ? (data.consentMode || 'ASK_FOR_CONSENT') : s.tokenization.consentMode) }
+          : null,
+        shopperCountryCode: data.country || 'FR',
+        lineItems: [{ description: itemLabel, quantity: 1, amountIncludingTax: amount }]
+      };
+      // shopper + metadata = "données qui voyagent" (Data Travel) — ignorées par l'API tant que le contrat n'est pas livré.
+      var preview = { sessionPayload: sessionPayload, dataTravel_ignoreParLAPI: { shopper: p.shopper, metadata: p.metadata } };
       pre.innerHTML = JSON.stringify(preview, null, 2)
         .replace(/"([^"]+)":/g, '<span class="k">"$1"</span>:').replace(/: "([^"]*)"/g, ': <span class="s">"$1"</span>').replace(/: (\d+)/g, ': <span class="n">$1</span>');
     }
