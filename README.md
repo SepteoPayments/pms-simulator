@@ -20,7 +20,7 @@ Sans ce fichier, le serveur ne démarre pas.
 Node ≥ 16 requis. Aucune dépendance à installer (modules natifs uniquement).
 
 ```powershell
-cd C:\Users\DYL.SENASSON\documents\pms-simulator
+cd C:\Users\JARVIS.STARKINDUSTRIES\documents\pms-simulator
 node server.js
 ```
 
