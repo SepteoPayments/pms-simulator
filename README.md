@@ -8,6 +8,13 @@ But : montrer qu'une seule API agnostique porte tous les métiers — et que les
 > **Hors du repo Septeo-Payments** (c'est une démo, pas du code produit). Ne jamais y committer.
 > `private.pem` est une clé de **test** (sandbox) — ne jamais la partager.
 
+## Secret — la clé privée (avant le 1er lancement)
+
+Dépose le fichier **`private.pem`** (clé privée **sandbox** du client de test) à la **racine** du repo.
+Il est **gitignoré** : chaque personne qui clone doit le placer (demande-le à l'équipe, jamais par un canal public).
+`config.js` pointe dessus (`privateKeyFile: './private.pem'`) et `server.js` le lit pour signer le token `private_key_jwt`.
+Sans ce fichier, le serveur ne démarre pas.
+
 ## Lancer
 
 Node ≥ 16 requis. Aucune dépendance à installer (modules natifs uniquement).
@@ -83,3 +90,10 @@ Contrats à conserver : `PMS.checkout(...)`, `PMS.pay`, `PMS.pos`, boutons `[dat
 
 Client de test **Marc Resort Group 2** (`clientId 516e19cb-…`), boutique **Marc Spa & Massage**
 (`publicStoreId 7fd1d1b5-…`), env Adyen **test**. Détails dans `config.js`.
+
+**La clé est calibrée sur un main-customer.** Le trio `private.pem` + `clientId` + `kid` identifie **un** main-customer (Marc Resort Group 2). Elle autorise **tout son périmètre** :
+
+- ✅ tu peux changer `publicStoreId` (dans `config.js`) pour **n'importe quelle boutique de CE main-customer** → ça marche.
+- ❌ elle **ne fonctionne pas** pour une boutique d'un **autre** main-customer → refus (cloisonnement, 403/404). Il faudrait la clé (clientId/kid + clé privée) **de cet autre main-customer**.
+
+Une clé = un main-customer, tous ses stores ; jamais les stores d'un autre.
